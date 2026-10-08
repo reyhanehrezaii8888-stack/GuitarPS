@@ -1,0 +1,10 @@
+{
+  "description": "Discover the right digital tools for your guitar challenges with personalized recommendations based on your needs and skill level.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
