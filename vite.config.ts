@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
   const emitSourcemaps = mode === 'development'
 
   return {
-    base: '/reyhanehrezaii8888-SaaS/',
+    base: '/GuitarPS/',
     build: {
       sourcemap: emitSourcemaps ? 'inline' : false,
       minify: !emitSourcemaps,
