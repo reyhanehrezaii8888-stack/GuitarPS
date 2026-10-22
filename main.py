@@ -1,70 +1,34 @@
 import os
-
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+from fastapi import FastAPI
 from openai import OpenAI
-from pydantic import BaseModel
 
-app = FastAPI(title="GuitarPS AI Backend", version="1.0.0")
+app = FastAPI(title="GuitarPS API", version="1.0.0")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# اتصال به ای‌پی‌آی AvalAI با استفاده از متغیر محیطی که در لیارا ذخیره کردی
+client = OpenAI(
+    api_key=os.environ.get("AVALAI_API_KEY"),
+    base_url="https://avalai.ir/v1"
 )
 
-api_key = os.getenv("AVALAI_API_KEY")
-
-class ChatRequest(BaseModel):
-    message: str
-    user_level: str = "مبتدی"
-
-
 @app.get("/")
-def home():
-    return {
-        "status": "ok",
-        "message": "GuitarPS API is running successfully!",
-    }
-
+def read_root():
+    return {"status": "success", "message": "GuitarPS API Server is running and connected!"}
 
 @app.post("/api/chat")
-def guitar_coach_chat(req: ChatRequest):
-    if not api_key:
-        raise HTTPException(
-            status_code=500,
-            detail="متغیر AVALAI_API_KEY در تنظیمات لیارا تنظیم نشده است.",
-        )
-
+def chat_with_agent(prompt: str):
     try:
-        client = OpenAI(
-            api_key=api_key,
-            base_url="https://api.avalai.ir/v1",
-        )
-
-        system_prompt = (
-            "تو مربی و دستیار تخصصی گیتار در پلتفرم GuitarPS هستی. "
-            "به پرسش‌های کاربر درباره آکوردها، ریتم، تکنیک، تمرین و تئوری موسیقی پاسخ بده. "
-            f"سطح نوازندگی کاربر: {req.user_level}. "
-            "پاسخ‌ها را دقیق، کاربردی و متناسب با سطح او بنویس."
-        )
-
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": req.message},
-            ],
-            temperature=0.7,
-            max_tokens=600,
+                {"role": "system", "content": "You are an expert guitar teaching assistant for GuitarPS."},
+                {"role": "user", "content": prompt}
+            ]
         )
-
         return {"reply": response.choices[0].message.content}
+    except Exception as e:
+        return {"error": str(e)}
 
-    except Exception:
-        raise HTTPException(
-            status_code=502,
-            detail="ارتباط با سرویس هوش مصنوعی برقرار نشد. تنظیمات API را بررسی کن.",
-        )
+# این بخش کمک می‌کند اگر فایل مستقیماً اجرا شد، سرور بالا بیاید
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
