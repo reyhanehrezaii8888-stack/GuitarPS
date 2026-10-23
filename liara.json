@@ -1,7 +1,7 @@
 {
   "platform": "python",
   "port": 8000,
-  "app": "main:app",
+  "command": "uvicorn main:app --host 0.0.0.0 --port 8000",
   "build": {
     "location": "iran"
   }
