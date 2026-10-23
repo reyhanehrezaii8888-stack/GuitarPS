@@ -1,8 +1,8 @@
 {
-  "app": "guitarps",
-  "port": 80,
+  "platform": "python",
+  "port": 8000,
+  "app": "main:app",
   "build": {
     "location": "iran"
-  },
-  "disks": []
+  }
 }
