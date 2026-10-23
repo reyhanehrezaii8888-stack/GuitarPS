@@ -1,8 +1,8 @@
 {
-  "app": "GuitarPS",
-  "platform": "python",
-  "port": 8000,
-  "args": [
-    "uvicorn main:app --host 0.0.0.0 --port 8000"
-  ]
+  "app": "guitarps",
+  "port": 80,
+  "build": {
+    "location": "iran"
+  },
+  "disks": []
 }
