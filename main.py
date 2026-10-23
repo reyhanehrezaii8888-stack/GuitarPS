@@ -1,34 +1,37 @@
 import os
-import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from openai import OpenAI
 
-app = FastAPI(title="GuitarPS API", version="1.0.0")
+app = FastAPI()
 
-# اتصال به ای‌پی‌آی AvalAI با استفاده از متغیر محیطی که در لیارا ذخیره کردی
+# مقداردهی کلاینت با خواندن مستقیم متغیر AVALAI_API_KEY و بیس‌ارل AvalAI
+api_key = os.getenv("AVALAI_API_KEY")
+
 client = OpenAI(
-    api_key=os.environ.get("AVALAI_API_KEY"),
-    base_url="https://avalai.ir/v1"
+    api_key=api_key,
+    base_url="https://api.avalai.ir/v1"  # آدرس استاندارد سرویس AvalAI
 )
+
+class PromptRequest(BaseModel):
+    prompt: str
 
 @app.get("/")
 def read_root():
-    return {"status": "success", "message": "GuitarPS API Server is running and connected!"}
+    return {"message": "GuitarPS Backend is running successfully!"}
 
-@app.post("/api/chat")
-def chat_with_agent(prompt: str):
+@app.post("/chat")
+def chat_with_ai(request: PromptRequest):
+    if not api_key:
+        raise HTTPException(status_code=500, detail="AVALAI_API_KEY is not set in environment variables.")
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o-mini",  # یا مدل دلخواه شما در AvalAI
             messages=[
-                {"role": "system", "content": "You are an expert guitar teaching assistant for GuitarPS."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": "You are an expert guitar teaching assistant."},
+                {"role": "user", "content": request.prompt}
             ]
         )
-        return {"reply": response.choices[0].message.content}
+        return {"response": response.choices[0].message.content}
     except Exception as e:
-        return {"error": str(e)}
-
-# این بخش کمک می‌کند اگر فایل مستقیماً اجرا شد، سرور بالا بیاید
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
+        raise HTTPException(status_code=500, detail=str(e))
