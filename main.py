@@ -16,22 +16,17 @@ def read_root():
 def chat_with_ai(request: PromptRequest):
     api_key = os.getenv("AVALAI_API_KEY")
     if not api_key:
-        raise HTTPException(
-            status_code=500, 
-            detail="AVALAI_API_KEY is not set in environment variables."
-        )
+        raise HTTPException(status_code=500, detail="AVALAI_API_KEY is not set in environment variables.")
+    
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.avalai.ir/v1"
+    )
     
     try:
-        client = OpenAI(
-            api_key=api_key,
-            base_url="https://api.avalai.ir/v1"
-        )
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are an expert guitar teaching assistant."},
-                {"role": "user", "content": request.prompt}
-            ]
+            model="gpt-4o-mini", # یا مدل مدنظرتان در آوال‌آی
+            messages=[{"role": "user", "content": request.prompt}]
         )
         return {"response": response.choices[0].message.content}
     except Exception as e:
