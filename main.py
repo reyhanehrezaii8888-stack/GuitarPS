@@ -12,6 +12,11 @@ class PromptRequest(BaseModel):
 def read_root():
     return {"message": "GuitarPS Backend is running successfully!"}
 
+# این بخش جدید برای سلامت سنجی است:
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.post("/chat")
 def chat_with_ai(request: PromptRequest):
     api_key = os.getenv("AVALAI_API_KEY")
@@ -25,7 +30,7 @@ def chat_with_ai(request: PromptRequest):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini", # یا مدل مدنظرتان در آوال‌آی
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": request.prompt}]
         )
         return {"response": response.choices[0].message.content}
