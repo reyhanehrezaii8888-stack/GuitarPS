@@ -1,38 +1,16 @@
-import os
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from openai import OpenAI
+from fastapi import FastAPI
 
 app = FastAPI()
 
-class PromptRequest(BaseModel):
-    prompt: str
-
 @app.get("/")
 def read_root():
-    return {"message": "GuitarPS Backend is running successfully!"}
+    return {
+        "status": "success",
+        "message": "GuitarPS Backend is running smoothly!"
+    }
 
-# این بخش جدید برای سلامت سنجی است:
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
-
-@app.post("/chat")
-def chat_with_ai(request: PromptRequest):
-    api_key = os.getenv("AVALAI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="AVALAI_API_KEY is not set in environment variables.")
-    
-    client = OpenAI(
-        api_key=api_key,
-        base_url="https://api.avalai.ir/v1"
-    )
-    
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": request.prompt}]
-        )
-        return {"response": response.choices[0].message.content}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "status": "healthy"
+    }
