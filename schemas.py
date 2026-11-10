@@ -25,3 +25,21 @@ class UserOut(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+# --- اسکیماهای ورود با پیامک (OTP) ---
+
+class OtpRequest(BaseModel):
+    phone: str = Field(..., min_length=10, max_length=13, description="شماره موبایل")
+
+class OtpResponse(BaseModel):
+    status: str
+    message: str
+    retry_after: Optional[int] = None   # ثانیه باقی‌مانده تا مجاز شدن ارسال مجدد
+
+class OtpVerify(BaseModel):
+    phone: str = Field(..., min_length=10, max_length=13)
+    code: str = Field(..., min_length=4, max_length=8)
+    email: Optional[EmailStr] = None    # اگر کاربر جدید است
+
+class OtpLoginResponse(Token):
+    is_new_user: bool = False
