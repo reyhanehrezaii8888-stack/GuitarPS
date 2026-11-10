@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timezone
 import httpx
 from fastapi import FastAPI, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from openai import OpenAI
@@ -51,8 +51,7 @@ class UserOut(BaseModel):
     phone: str | None = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # مسیرهای تست و بررسی سلامت سرور
 @app.get("/")
