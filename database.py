@@ -3,8 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# مسیر کاملاً آزاد و بدون محدودیت در لینوکس لیارا:
-DB_URL = "sqlite:////tmp/guitarps.db"
+# مسیر هارد دائمی و ضدگلوله:
+DB_URL = "sqlite:////data/guitarps.db"
 
 engine = create_engine(
     DB_URL, 
