@@ -16,10 +16,15 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="GuitarPS Backend")
 
 # تنظیمات کلاینت هوش مصنوعی (AvalAI)
-client = OpenAI(
-    api_key=os.getenv("AVALAI_API_KEY", os.getenv("OPENAI_API_KEY")),
-    base_url=os.getenv("OPENAI_BASE_URL", "https://api.avalai.ir/v1")
-)
+avalai_key = os.getenv("AVALAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+
+if avalai_key:
+    client = OpenAI(
+        api_key=avalai_key,
+        base_url=os.getenv("OPENAI_BASE_URL", "https://api.avalai.ir/v1")
+    )
+else:
+    client = None
 
 # تنظیمات پیامک SMS.ir
 SMS_API_KEY = os.getenv("SMS_API_KEY")
