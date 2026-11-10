@@ -28,3 +28,11 @@ class OtpChallenge(Base):
     expires_at = Column(DateTime, nullable=False)                      # زمان انقضا (۵ دقیقه)
     sent_at = Column(DateTime, nullable=False)                         # زمان ارسال (برای اعمال کول‌داون ۶۰ ثانیه‌ای)
     attempts = Column(Integer, default=0, nullable=False)              # تعداد دفعات ورود اشتباه
+
+class PhoneLead(Base):
+    __tablename__ = "phone_leads"
+
+    id = Column(Integer, primary_key=True, index=True)
+    phone = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+    verified_at = Column(DateTime, nullable=False)
