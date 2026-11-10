@@ -3,15 +3,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# در لیارا مسیر /var/lib/liara/storage مسیر دائمی و مجاز برای نوشتن است
-STORAGE_DIR = "/var/lib/liara/storage"
-# اگر در سیستم خودت (Local) هستی، همان مسیر قبلی باشد
-DB_PATH = os.path.join(STORAGE_DIR, "guitarps.db") if os.path.exists(STORAGE_DIR) else "guitarps.db"
-
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
+# مسیر کاملاً آزاد و بدون محدودیت در لینوکس لیارا:
+DB_URL = "sqlite:////tmp/guitarps.db"
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
+    DB_URL, 
     connect_args={"check_same_thread": False}
 )
 
