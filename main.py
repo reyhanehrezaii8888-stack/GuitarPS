@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import httpx
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from passlib.context import CryptContext
@@ -61,11 +61,12 @@ class UserOut(BaseModel):
     email: EmailStr
     phone: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 
 class ProblemAnalyzeRequest(BaseModel):
     problem: str
+
 
 # مسیرهای بررسی سلامت سرور
 @app.get("/")
