@@ -28,7 +28,7 @@ if len(JWT_SECRET) < 32:
 DB_PATH = engine.url.database
 
 OTP_MODE = os.getenv("OTP_MODE", "disabled")
-AVALAI_API_KEY = os.getenv("AVALAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+AVALAI_API_KEY = os.getenv("AVALAI_API_KEY") or os.getenv("AI_API_KEY")
 AVALAI_MODEL = os.getenv("AVALAI_MODEL", "gpt-4o-mini")
 APPTIME = int(os.getenv("OTP_EXPIRY_SECONDS", "300"))
 
@@ -54,7 +54,7 @@ ai_client = None
 if AVALAI_API_KEY:
     ai_client = OpenAI(
         api_key=AVALAI_API_KEY,
-        base_url=os.getenv("OPENAI_BASE_URL", "https://api.avalai.ir/v1"),
+        base_url=os.getenv("AI_BASE_URL", "https://api.avalai.ir/v1"),
         timeout=30.0,
     )
 
