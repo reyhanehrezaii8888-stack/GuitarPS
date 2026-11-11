@@ -1,16 +1,286 @@
-<!doctype html>
-<html lang="<!-- figma:lang -->">
-  <head>
-    <!-- figma:head-start -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><!-- figma:title --></title>
-    <!-- figma:head-end -->
-  </head>
-  <body>
-    <!-- figma:body-start -->
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-    <!-- figma:body-end -->
-  </body>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuitarPS - پیشنهاد هوشمند ابزار و تحلیل مشکلات هنگام نوازندگی</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; }
+        .glass-modal { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 px-6 py-4 flex justify-between items-center bg-slate-900/50 sticky top-0 z-30 backdrop-blur">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+            </div>
+            <span class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">GuitarPS</span>
+        </div>
+        <div>
+            <button id="authBtn" onclick="openAuthModal()" class="px-5 py-2 text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition shadow-lg shadow-purple-600/25 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <span id="authBtnText">ورود / ثبت‌نام</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-12 flex flex-col items-center justify-center">
+        <div class="text-center mb-10 space-y-3">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">مشکل گیتارت رو بگو، <span class="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">ابزار و تمزین مناسبش</span> رو پیدا کن.</h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">مشکلی که توی نوازندگی گیتار داری و نمی دونی چطور حلش کنی رو توضیح بده تا بهترین راه حل براش رو بهت پیشنهاد بدیم!</p>
+        </div>
+
+        <!-- Problem Input Card -->
+        <div class="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-2xl backdrop-blur">
+            <textarea id="problemInput" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition resize-none text-base" placeholder="مثلاً: توی آکورد گرفتن فاو (F) سیم اول و دوم تمیز صدا نمیده و گزگز می‌کنه..."></textarea>
+            <div class="flex justify-between items-center mt-4">
+                <span id="quotaInfo" class="text-xs text-slate-400">سهمیه رایگان: نامشخص</span>
+                <button onclick="handleAnalyze()" id="analyzeBtn" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-600/30 transition flex items-center gap-2">
+                    <span>تحلیل وپیشنهاد راه حل و ابزار</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden mt-8 text-center space-y-3">
+            <div class="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-slate-400 text-sm">هوش مصنوعی در حال تحلیل مشکل و یافتن بهترین تمرین و ابزار برای شماست...</p>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultSection" class="hidden w-full mt-8 space-y-6"></div>
+    </main>
+
+    <!-- Auth Modal (Blur Overlay) -->
+    <div id="authModal" class="fixed inset-0 glass-modal z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Step 1: Phone Input -->
+            <div id="stepPhone" class="space-y-4">
+                <h3 class="text-xl font-bold text-white">ورود یا ثبت‌نام در GuitarPS</h3>
+                <p class="text-slate-400 text-sm">شماره موبایل خود را وارد کنید تا کد تایید برایتان ارسال شود.</p>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">شماره موبایل</label>
+                    <input type="tel" id="phoneInput" placeholder="09123456789" dir="ltr" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-left text-slate-100 focus:outline-none focus:border-purple-500">
+                </div>
+                <button onclick="requestOtp()" id="otpReqBtn" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition shadow-lg shadow-purple-600/30">ارسال کد تایید</button>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="stepOtp" class="space-y-4 hidden">
+                <h3 class="text-xl font-bold text-white">تایید کد یک‌بار مصرف</h3>
+                <p class="text-slate-400 text-sm">کد ارسال شده به شماره <span id="displayPhone" class="text-purple-400 font-mono"></span> را وارد کنید.</p>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">کد تایید </label>
+                    <input type="text" id="otpInput" placeholder="123456" dir="ltr" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center tracking-widest text-lg font-mono text-slate-100 focus:outline-none focus:border-purple-500">
+                </div>
+                <button onclick="verifyOtp()" id="otpVerBtn" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition shadow-lg shadow-purple-600/30">تایید و ورود</button>
+                <button onclick="backToPhone()" class="w-full text-xs text-slate-400 hover:text-white pt-2">ویرایش شماره موبایل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const API_BASE = "https://app.guitarreyhane.ir";
+        let pendingAction = false;
+
+        // Check Auth on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('guitar_token');
+            if (token) {
+                updateAuthUI(true);
+            }
+        });
+
+        function updateAuthUI(isLoggedIn) {
+            const btnText = document.getElementById('authBtnText');
+            if (isLoggedIn) {
+                btnText.textContent = "حساب کاربری";
+            } else {
+                btnText.textContent = "ورود / ثبت‌نام";
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('stepPhone').classList.remove('hidden');
+            document.getElementById('stepOtp').classList.add('hidden');
+            pendingAction = false;
+        }
+
+        async function requestOtp() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!phone || phone.length < 10) {
+                alert("لطفاً شماره موبایل معتبر وارد کنید.");
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/otp/request`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                if (res.ok) {
+                    document.getElementById('displayPhone').textContent = phone;
+                    document.getElementById('stepPhone').classList.add('hidden');
+                    document.getElementById('stepOtp').classList.remove('hidden');
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || "خطا در ارسال کد تایید");
+                }
+            } catch (e) {
+                alert("خطا در ارتباط با سرور");
+            }
+        }
+
+        function backToPhone() {
+            document.getElementById('stepOtp').classList.add('hidden');
+            document.getElementById('stepPhone').classList.remove('hidden');
+        }
+
+        async function verifyOtp() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            const code = document.getElementById('otpInput').value.trim();
+            if (!code) {
+                alert("لطفاً کد تایید را وارد کنید.");
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/otp/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, code })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('guitar_token', data.access_token);
+                    updateAuthUI(true);
+                    closeAuthModal();
+                    
+                    // If user was trying to analyze, resume automatically!
+                    if (pendingAction) {
+                        handleAnalyze();
+                    }
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || "کد تایید نامعتبر است");
+                }
+            } catch (e) {
+                alert("خطا در تایید کد");
+            }
+        }
+
+        async function handleAnalyze() {
+            const problem = document.getElementById('problemInput').value.trim();
+            if (!problem) {
+                alert("لطفاً ابتدا مشکل گیتار خود را توضیح دهید.");
+                return;
+            }
+
+            const token = localStorage.getItem('guitar_token');
+            if (!token) {
+                pendingAction = true;
+                openAuthModal();
+                return;
+            }
+
+            // Show Loading & Hide Result
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('analyzeBtn').disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ text: problem })
+                });
+
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('analyzeBtn').disabled = false;
+
+                if (res.status === 401) {
+                    localStorage.removeItem('guitar_token');
+                    updateAuthUI(false);
+                    pendingAction = true;
+                    openAuthModal();
+                    return;
+                }
+
+                if (res.status === 403) {
+                    const err = await res.json();
+                    alert(err.detail || "سهمیه تحلیل شما به پایان رسیده است.");
+                    return;
+                }
+
+                if (res.ok) {
+                    const data = await res.json();
+                    renderResult(data);
+                } else {
+                    const err = await res.json();
+                    alert(err.detail || "خطا در پردازش تحلیل");
+                }
+            } catch (e) {
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('analyzeBtn').disabled = false;
+                alert("خطا در ارتباط با سرور");
+            }
+        }
+
+        function renderResult(data) {
+            const section = document.getElementById('resultSection');
+            // Assuming data contains: rationale (explanation), practice (or tool), tool info
+            section.innerHTML = `
+                <div class="bg-slate-900 border border-purple-500/30 rounded-2xl p-6 shadow-xl space-y-6">
+                    <div class="border-b border-slate-800 pb-4">
+                        <h3 class="text-lg font-bold text-purple-400 mb-2">💡 تحلیل هوشمند مشکل</h3>
+                        <p class="text-slate-300 leading-relaxed">${data.rationale || data.diagnosis || "تحلیل کامل مشکل شما"}</p>
+                    </div>
+
+                    ${data.tool ? `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-medium">ابزار پیشنهادی</span>
+                                <h4 class="text-xl font-bold text-white mt-2">${data.tool.name || 'ابزار تخصصی گیتار'}</h4>
+                            </div>
+                            <span class="text-xs text-slate-400 bg-slate-900 px-3 py-1 rounded-lg">تطابق: ${Math.round((data.score || 0) * 100)}%</span>
+                        </div>
+                        <p class="text-slate-400 text-sm">${data.tool.description || ''}</p>
+                        ${data.tool.url ? `
+                            <div class="pt-2">
+                                <a href="${data.tool.url}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium transition shadow-lg shadow-purple-600/20">
+                                    <span>مشاهده و دانلود ابزار</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 10v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                               - </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            section.classList.remove('hidden');
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
 </html>
