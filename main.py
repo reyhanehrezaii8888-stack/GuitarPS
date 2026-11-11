@@ -1,444 +1,405 @@
-import hashlib
-import hmac
-import logging
 import os
 import re
 import secrets
+import hmac
+import hashlib
+import logging
+import sqlite3
 import time
-from datetime import datetime, timedelta, timezone
-
-import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
+from datetime import datetime, timezone
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from openai import OpenAI
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import (
-    Column,
-    Integer,
-    MetaData,
-    String,
-    Table,
-    select,
-    text,
-    update,
-    insert,
-)
-from sqlalchemy.orm import Session
+from openai import OpenAI
+import jwt
+from database import engine
 
-import models
-from database import engine, get_db
-
+logger = logging.getLogger("guitarps")
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# ساخت جدول‌های اصلی دیتابیس
-models.Base.metadata.create_all(bind=engine)
-
-# جدول‌های فاز اول (فقط شماره‌ها، OTP، و شمارنده‌ی تحلیل‌های موفق)
-mvp_metadata = MetaData()
-
-phone_users = Table(
-    "guitarps_phone_users",
-    mvp_metadata,
-    Column("id", Integer, primary_key=True),
-    Column("phone", String(11), nullable=False, unique=True),
-    Column("success_count", Integer, nullable=False, default=0),  # شمارنده برای محدودیت ۳ بار
-)
-
-otp_codes = Table(
-    "guitarps_otp_codes",
-    mvp_metadata,
-    Column("phone", String(11), primary_key=True),
-    Column("code_hash", String(64), nullable=False),
-    Column("expires_at", Integer, nullable=False),
-    Column("last_sent_at", Integer, nullable=False),
-    Column("window_start", Integer, nullable=False),
-    Column("window_count", Integer, nullable=False),
-    Column("attempts", Integer, nullable=False),
-    Column("consumed", Integer, nullable=False),
-)
-
-mvp_metadata.create_all(bind=engine)
-
-JWT_SECRET = os.getenv("JWT_SECRET", "")
-if len(JWT_SECRET) < 32:
-    raise RuntimeError(
-        "JWT_SECRET تنظیم نشده یا کوتاه است؛ یک مقدار تصادفی حداقل ۳۲ کاراکتری تنظیم کن."
-    )
-
-OTP_MODE = os.getenv("OTP_MODE", "disabled").strip().lower()
-AVALAI_API_KEY = os.getenv("AVALAI_API_KEY", "").strip()
-AVALAI_MODEL = os.getenv("AVALAI_MODEL", "gpt-4o-mini")
-
-ai_client = (
-    OpenAI(
-        api_key=AVALAI_API_KEY,
-        base_url=os.getenv("OPENAI_BASE_URL", "https://api.avalai.ir/v1"),
-        timeout=30.0,
-    )
-    if AVALAI_API_KEY
-    else None
-)
 
 app = FastAPI(title="GuitarPS Backend")
 
-origins = [
-    origin.strip()
-    for origin in os.getenv(
-        "CORS_ORIGINS",
+# ---------- Config ----------
+JWT_SECRET = os.getenv("JWT_SECRET", "this-is-an-insecure-dev-secret-change-me-please-123456789")
+if len(JWT_SECRET) < 32:
+    raise RuntimeError("JWT_SECRET تنظیم نشده یا کوتاه است؛ یک مقدار تصادفی حداقل ۳۲ کاراکتری تنظیم کن.")
+
+DB_PATH = engine.url.database
+
+OTP_MODE = os.getenv("OTP_MODE", "disabled")
+AVALAI_API_KEY = os.getenv("AVALAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+AVALAI_MODEL = os.getenv("AVALAI_MODEL", "gpt-4o-mini")
+APPTIME = int(os.getenv("OTP_EXPIRY_SECONDS", "300"))
+
+allowed_origins_env = os.getenv("CORS_ORIGINS", "")
+allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+if not allowed_origins:
+    allowed_origins = [
         "https://reyhanehrezaii8888-stack.github.io",
-    ).split(",")
-    if origin.strip()
-]
+        "https://app.guitarreyhane.ir",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
+    allow_origins=allowed_origins,
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
+    allow_credentials=False,
 )
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
-
-def normalize_phone(value: str) -> str:
-    persian_digits = "۰۱۲۳۴۵۶۷۸۹"
-    arabic_digits = "٠١٢٣٤٥٦٧٨٩"
-    english_digits = "0123456789"
-
-    value = value.translate(
-        str.maketrans(
-            persian_digits + arabic_digits,
-            english_digits + english_digits,
-        )
+ai_client = None
+if AVALAI_API_KEY:
+    ai_client = OpenAI(
+        api_key=AVALAI_API_KEY,
+        base_url=os.getenv("OPENAI_BASE_URL", "https://api.avalai.ir/v1"),
+        timeout=30.0,
     )
-    value = value.strip().replace(" ", "").replace("-", "")
 
-    if value.startswith("+98"):
-        value = "0" + value[3:]
-    elif value.startswith("0098"):
-        value = "0" + value[4:]
-    elif value.startswith("98"):
-        value = "0" + value[2:]
+# ---------- Database schema (only what phase 1 needs) ----------
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS guitarps_phone_users (
+    phone TEXT PRIMARY KEY,
+    success_count INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS guitarps_otps (
+    phone TEXT PRIMARY KEY,
+    code_hash TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    sent_at INTEGER NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    window_start INTEGER NOT NULL,
+    sent_in_window INTEGER NOT NULL DEFAULT 0
+);
+"""
 
-    if not re.fullmatch(r"09\d{9}", value):
-        raise ValueError("شماره موبایل را به شکل 09123456789 وارد کن.")
 
-    return value
+def init_db():
+    if not DB_PATH or DB_PATH == ":memory:":
+        return
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        conn.executescript(SCHEMA)
+        conn.commit()
+    finally:
+        conn.close()
+
+
+init_db()
+
+
+def get_conn():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+# ---------- Helpers ----------
+PERSIAN_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")
+ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
+
+
+def normalize_phone(raw: str) -> str:
+    if not raw:
+        raise HTTPException(status_code=400, detail="شماره موبایل را وارد کن.")
+    s = str(raw).strip().translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)
+    if s.startswith("+98"):
+        s = "0" + s[3:]
+    elif s.startswith("0098"):
+        s = "0" + s[4:]
+    elif s.startswith("98") and len(s) == 12 and s.startswith("989"):
+        s = "0" + s[2:]
+    if re.fullmatch(r"09\d{9}", s):
+        return s
+    raise HTTPException(status_code=400, detail="شماره موبایل را به شکل 09123456789 وارد کن.")
 
 
 def otp_hash(phone: str, code: str) -> str:
-    message = f"guitarps-otp:{phone}:{code}".encode("utf-8")
     return hmac.new(
-        JWT_SECRET.encode("utf-8"),
-        message,
-        hashlib.sha256,
+        JWT_SECRET.encode(), f"guitarps-otp:{phone}:{code}".encode(), hashlib.sha256
     ).hexdigest()
 
 
-class PhoneInput(BaseModel):
-    phone: str
-
-    @field_validator("phone")
-    @classmethod
-    def validate_phone(cls, value: str) -> str:
-        return normalize_phone(value)
-
-
-class VerifyInput(PhoneInput):
-    code: str = Field(min_length=6, max_length=6)
-
-
-class ProblemInput(BaseModel):
-    problem: str = Field(min_length=3, max_length=3000)
+def create_jwt(phone: str) -> str:
+    now = int(time.time())
+    return jwt.encode(
+        {
+            "sub": "phone:" + phone,
+            "iat": now,
+            "exp": now + int(os.getenv("JWT_EXPIRY_SECONDS", "604800")),
+        },
+        JWT_SECRET,
+        algorithm="HS256",
+    )
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
-    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ):
-    error = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="ابتدا وارد حساب کاربری شو.",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
     if credentials is None:
-        raise error
-
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="ابتدا وارد حساب کاربری شو."
+        )
+    token = credentials.credentials
     try:
         payload = jwt.decode(
-            credentials.credentials,
-            JWT_SECRET,
-            algorithms=["HS256"],
-            options={"require": ["exp", "sub"]},
+            token, JWT_SECRET, algorithms=["HS256"], options={"require": ["exp", "sub"]}
         )
-        subject = payload["sub"]
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="نشست شما منقضی شده، دوباره وارد شو.")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="توکن نامعتبر است.")
+    sub = payload.get("sub", "")
+    if not sub.startswith("phone:"):
+        raise HTTPException(status_code=401, detail="توکن نامعتبر است.")
+    phone = sub.removeprefix("phone:")
+    conn = get_conn()
+    try:
+        row = conn.execute(
+            "SELECT phone, success_count FROM guitarps_phone_users WHERE phone = ?",
+            (phone,),
+        ).fetchone()
+    finally:
+        conn.close()
+    if row is None:
+        raise HTTPException(status_code=401, detail="کاربر یافت نشد.")
+    return {"phone": row["phone"], "success_count": row["success_count"]}
 
-        if not isinstance(subject, str) or not subject.startswith("phone:"):
-            raise error
 
-        user_id = int(subject.removeprefix("phone:"))
-    except (jwt.InvalidTokenError, ValueError, TypeError):
-        raise error
+# ---------- Schemas ----------
+class PhoneInput(BaseModel):
+    phone: str = Field(..., description="شماره موبایل به فرم 09123456789")
 
-    user = db.execute(
-        select(phone_users.c.id, phone_users.c.phone, phone_users.c.success_count).where(
-            phone_users.c.id == user_id
-        )
-    ).mappings().first()
-
-    if user is None:
-        raise error
-
-    return user
+    @field_validator("phone")
+    @classmethod
+    def _norm(cls, v):
+        return v
 
 
+class VerifyInput(PhoneInput):
+    code: str = Field(..., min_length=6, max_length=6)
+
+
+class ProblemInput(BaseModel):
+    problem: str = Field(..., min_length=3, max_length=3000)
+
+
+# ---------- Routes ----------
 @app.get("/")
 def read_root():
     return {"message": "GuitarPS Backend is running smoothly!"}
 
 
 @app.get("/health")
-def health_check(db: Session = Depends(get_db)):
+def health():
     try:
-        db.execute(text("SELECT 1"))
+        conn = get_conn()
+        conn.execute("SELECT 1")
+        conn.close()
     except Exception:
-        logger.exception("Database health check failed")
-        raise HTTPException(
-            status_code=503,
-            detail="اتصال به دیتابیس برقرار نیست.",
-        )
-
+        raise HTTPException(status_code=503, detail="اتصال به دیتابیس برقرار نیست.")
     return {"status": "healthy"}
 
 
-@app.post("/api/auth/otp/request")
-def request_otp(data: PhoneInput, db: Session = Depends(get_db)):
+@app.post("/register", status_code=200)
+@app.post("/api/auth/otp/request", status_code=200)
+def request_otp(data: PhoneInput):
+    phone = normalize_phone(data.phone)
     if OTP_MODE != "log":
         raise HTTPException(
-            status_code=503,
-            detail="روش ارسال OTP هنوز تنظیم نشده است.",
+            status_code=503, detail="روش ارسال OTP هنوز تنظیم نشده است."
         )
-
     now = int(time.time())
-    existing = db.execute(
-        select(otp_codes).where(otp_codes.c.phone == data.phone)
-    ).mappings().first()
-
-    if existing and now - existing["last_sent_at"] < 60:
-        raise HTTPException(
-            status_code=429,
-            detail="برای دریافت کد جدید، یک دقیقه صبر کن.",
-        )
-
-    if existing and now - existing["window_start"] < 3600:
-        window_start = existing["window_start"]
-        window_count = existing["window_count"]
-
-        if window_count >= 5:
-            raise HTTPException(
-                status_code=429,
-                detail="تعداد درخواست‌های این شماره بیش از حد مجاز است.",
-            )
-    else:
-        window_start = now
-        window_count = 0
-
-    code = f"{secrets.randbelow(1_000_000):06d}"
-    values = {
-        "code_hash": otp_hash(data.phone, code),
-        "expires_at": now + 300,
-        "last_sent_at": now,
-        "window_start": window_start,
-        "window_count": window_count + 1,
-        "attempts": 0,
-        "consumed": 0,
-    }
-
+    conn = get_conn()
     try:
-        if existing:
-            db.execute(
-                update(otp_codes)
-                .where(otp_codes.c.phone == data.phone)
-                .values(**values)
-            )
+        conn.execute("BEGIN IMMEDIATE")
+        row = conn.execute(
+            "SELECT sent_at, sent_in_window, window_start FROM guitarps_otps WHERE phone = ?",
+            (phone,),
+        ).fetchone()
+        if row:
+            if now - row["sent_at"] < 60:
+                raise HTTPException(
+                    status_code=429, detail="برای دریافت کد جدید، یک دقیقه صبر کن."
+                )
+            window_start = row["window_start"]
+            sent_in_window = row["sent_in_window"]
+            if now - window_start >= 3600:
+                window_start = now
+                sent_in_window = 0
+            if sent_in_window >= 5:
+                raise HTTPException(
+                    status_code=429,
+                    detail="تعداد درخواست‌های این شماره بیش از حد مجاز است.",
+                )
         else:
-            db.execute(insert(otp_codes).values(phone=data.phone, **values))
+            window_start = now
+            sent_in_window = 0
 
-        db.commit()
+        code = f"{secrets.randbelow(1_000_000):06d}"
+        expires_at = now + APPTIME
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO guitarps_otps
+            (phone, code_hash, expires_at, sent_at, attempts, window_start, sent_in_window)
+            VALUES (?, ?, ?, ?, 0, ?, ?)
+            """,
+            (phone, otp_hash(phone, code), expires_at, now, window_start, sent_in_window + 1),
+        )
+        conn.commit()
+    except HTTPException:
+        conn.rollback()
+        raise
     except Exception:
-        db.rollback()
-        logger.exception("Could not store OTP")
+        conn.rollback()
+        logger.exception("Failed to record OTP")
         raise HTTPException(status_code=500, detail="خطا در ثبت کد تأیید.")
+    finally:
+        conn.close()
 
-    logger.warning(
-        "TEST OTP for phone ending %s: %s",
-        data.phone[-4:],
-        code,
-    )
-    return {"message": "کد تست در لاگ سرور ثبت شد.", "expires_in": 300}
+    logger.warning("TEST OTP for phone ending %s: %s", phone[-4:], code)
+    return {"message": "کد تست در لاگ سرور ثبت شد.", "expires_in": APPTIME}
 
 
 @app.post("/api/auth/otp/verify")
-def verify_otp(data: VerifyInput, db: Session = Depends(get_db)):
-    if not re.fullmatch(r"\d{6}", data.code):
-        raise HTTPException(status_code=422, detail="کد باید شش رقم باشد.")
-
+def verify_otp(data: VerifyInput):
+    phone = normalize_phone(data.phone)
     now = int(time.time())
-    saved = db.execute(
-        select(otp_codes).where(otp_codes.c.phone == data.phone)
-    ).mappings().first()
-
-    invalid = HTTPException(
-        status_code=400,
-        detail="کد نامعتبر، استفاده‌شده یا منقضی است.",
-    )
-
-    if (
-        saved is None
-        or saved["consumed"]
-        or saved["attempts"] >= 5
-        or saved["expires_at"] <= now
-    ):
-        raise invalid
-
-    supplied_hash = otp_hash(data.phone, data.code)
-
-    if not hmac.compare_digest(supplied_hash, saved["code_hash"]):
-        db.execute(
-            update(otp_codes)
-            .where(
-                otp_codes.c.phone == data.phone,
-                otp_codes.c.consumed == 0,
-                otp_codes.c.attempts < 5,
-            )
-            .values(attempts=otp_codes.c.attempts + 1)
-        )
-        db.commit()
-        raise invalid
-
+    conn = get_conn()
     try:
-        claimed = db.execute(
-            update(otp_codes)
-            .where(
-                otp_codes.c.phone == data.phone,
-                otp_codes.c.code_hash == saved["code_hash"],
-                otp_codes.c.consumed == 0,
-                otp_codes.c.attempts < 5,
-                otp_codes.c.expires_at > now,
+        conn.execute("BEGIN IMMEDIATE")
+        row = conn.execute(
+            "SELECT code_hash, expires_at, attempts FROM guitarps_otps WHERE phone = ?",
+            (phone,),
+        ).fetchone()
+        if row is None:
+            raise HTTPException(status_code=400, detail="ابتدا درخواست کد بده.")
+        if now > row["expires_at"]:
+            conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
+            conn.commit()
+            raise HTTPException(status_code=400, detail="کد منقضی شده است.")
+        if row["attempts"] >= 5:
+            conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
+            conn.commit()
+            raise HTTPException(status_code=429, detail="تلاش‌های ناموفق بیش از حد مجاز بود؛ دوباره کد بگیر.")
+
+        if not hmac.compare_digest(row["code_hash"], otp_hash(phone, data.code)):
+            conn.execute(
+                "UPDATE guitarps_otps SET attempts = attempts + 1 WHERE phone = ?",
+                (phone,),
             )
-            .values(consumed=1)
+            conn.commit()
+            raise HTTPException(status_code=400, detail="کد اشتباه است.")
+
+        conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
+        conn.execute(
+            "INSERT OR IGNORE INTO guitarps_phone_users (phone, success_count, created_at) VALUES (?, 0, ?)",
+            (phone, now),
         )
-
-        if claimed.rowcount != 1:
-            db.rollback()
-            raise invalid
-
-        user = db.execute(
-            select(phone_users.c.id).where(phone_users.c.phone == data.phone)
-        ).first()
-
-        if user is None:
-            db.execute(
-                insert(phone_users).values(phone=data.phone, success_count=0)
-            )
-            user_row = db.execute(
-                select(phone_users.c.id).where(phone_users.c.phone == data.phone)
-            ).first()
-            user_id = user_row.id
-        else:
-            user_id = user.id
-
-        db.commit()
+        conn.commit()
     except HTTPException:
+        conn.rollback()
         raise
     except Exception:
-        db.rollback()
-        logger.exception("OTP verification failed")
-        raise HTTPException(status_code=500, detail="خطا در ورود کاربر.")
+        conn.rollback()
+        logger.exception("OTP verify failed")
+        raise HTTPException(status_code=500, detail="خطا در تأیید کد.")
+    finally:
+        conn.close()
 
-    token = jwt.encode(
-        {
-            "sub": f"phone:{user_id}",
-            "exp": datetime.now(timezone.utc) + timedelta(days=1),
-        },
-        JWT_SECRET,
-        algorithm="HS256",
-    )
+    return {"access_token": create_jwt(phone), "token_type": "bearer", "phone": phone}
+
+
+ALLOWED_TOOLS = {
+    "tuner": {"name": "تیونر آنلاین گیتار (Fender)", "url": "https://www.fender.com/online-guitar-tuner/"},
+    "metronome": {"name": "مترونوم آنلاین (JustinGuitar)", "url": "https://www.justinguitar.com/metronome"},
+    "guitar": {"name": "ابزار گیتار آنلاین (Musicca)", "url": "https://www.musicca.com/guitar"},
+}
+
+
+def parse_ai_answer(raw: str):
+    try:
+        import json as _json
+        obj = _json.loads(raw)
+    except Exception:
+        raise HTTPException(status_code=502, detail="پاسخ هوش مصنوعی قابل خواندن نبود.")
+    analysis = str(obj.get("analysis", "")).strip()
+    exercise = str(obj.get("exercise", "")).strip()
+    tool_key = str(obj.get("tool_key", "")).strip()
+    if not analysis or not exercise:
+        raise HTTPException(status_code=502, detail="پاسخ هوش مصنوعی ناقص بود.")
+    if tool_key not in ALLOWED_TOOLS:
+        tool_key = "guitar"
+    return analysis, exercise, ALLOWED_TOOLS[tool_key]
+
+
+SYSTEM_PROMPT = (
+    "تو راهنمای آموزشی گیتار برای هنرجوی مبتدی هستی. "
+    "خروجی را فقط به صورت JSON معتبر برگردان با این کلیدها: "
+    "analysis (توضیح مشکل به زبان ساده فارسی)، exercise (یک تمرین عملی مشخص و کاربردی به فارسی)، "
+    "tool_key (فقط یکی از این سه مقدار: tuner یا metronome یا guitar، متناسب با مشکل)."
+)
+
+
+@app.post("/api/analyze")
+def analyze(problem_data: ProblemInput, user: dict = Depends(get_current_user)):
+    if ai_client is None:
+        raise HTTPException(status_code=503, detail="کلید هوش مصنوعی تنظیم نشده است.")
+
+    phone = user["phone"]
+    conn = get_conn()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        row = conn.execute(
+            "SELECT success_count FROM guitarps_phone_users WHERE phone = ?",
+            (phone,),
+        ).fetchone()
+        success_count = row["success_count"] if row else 0
+        if success_count >= 3:
+            raise HTTPException(
+                status_code=429, detail="سقف ۳ تحلیل موفق برای این شماره تمام شده است."
+            )
+        try:
+            response = ai_client.chat.completions.create(
+                model=AVALAI_MODEL,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": problem_data.problem},
+                ],
+                temperature=0.7,
+            )
+            answer = response.choices[0].message.content
+            analysis, exercise, tool = parse_ai_answer(answer)
+        except HTTPException:
+            conn.rollback()
+            raise
+        except Exception:
+            conn.rollback()
+            logger.exception("AI call failed")
+            raise HTTPException(status_code=502, detail="خطا در ارتباط با سرویس هوش مصنوعی.")
+
+        conn.execute(
+            "UPDATE guitarps_phone_users SET success_count = success_count + 1 WHERE phone = ?",
+            (phone,),
+        )
+        conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
+        conn.commit()
+    except HTTPException:
+        conn.rollback()
+        raise
+    except Exception:
+        conn.rollback()
+        logger.exception("Analyze failed")
+        raise HTTPException(status_code=500, detail="خطا در فرآیند تحلیل.")
+    finally:
+        conn.close()
 
     return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user_id": user_id,
+        "analysis": analysis,
+        "exercise": exercise,
+        "tool": {"name": tool["name"], "url": tool["url"]},
+        "remaining_uses": 3 - (success_count + 1),
     }
-
-
-@app.post("/api/analyze", status_code=200)
-def analyze_problem(
-    data: ProblemInput,
-    user=Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    # بررسی محدودیت ۳ تحلیل موفق
-    if user["success_count"] >= 3:
-        raise HTTPException(
-            status_code=403,
-            detail="سهمیه‌ی ۳ تحلیل رایگان شما به پایان رسیده است.",
-        )
-
-    problem_text = data.problem.strip()
-    if not problem_text:
-        raise HTTPException(status_code=422, detail="متن مشکل خالی است.")
-
-    if ai_client is None:
-        raise HTTPException(
-            status_code=503,
-            detail="کلید AVALAI_API_KEY تنظیم نشده است.",
-        )
-
-    try:
-        response = ai_client.chat.completions.create(
-            model=AVALAI_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "تو مربی حرفه‌ای گیتار برای هنرجویان مبتدی هستی. "
-                        "پاسخ خود را دقیقاً در ۳ بخش مجزا با این عنوان‌ها ارائه بده:\n"
-                        "۱. تحلیل مشکل (توضیح کوتاه علت مشکل)\n"
-                        "۲. تمرین عملی (یک گام تمرینی مشخص برای رفع مشکل)\n"
-                        "۳. ابزار مرتبط (معرفی یک ابزار یا سایت مفید همراه با لینک معتبر آن)"
-                    ),
-                },
-                {"role": "user", "content": problem_text},
-            ],
-        )
-
-        answer = response.choices[0].message.content
-        if not answer:
-            raise ValueError("Empty AI response")
-
-        # افزایش شمارنده تحلیل‌های موفق کاربر
-        db.execute(
-            update(phone_users)
-            .where(phone_users.c.id == user["id"])
-            .values(success_count=phone_users.c.success_count + 1)
-        )
-        db.commit()
-
-        return {
-            "success": True,
-            "remaining_analyses": 3 - (user["success_count"] + 1),
-            "result": answer,
-        }
-
-    except Exception:
-        db.rollback()
-        logger.exception("AvalAI analysis failed")
-        raise HTTPException(
-            status_code=502,
-            detail="خطا در تحلیل هوش مصنوعی. لطفاً دوباره تلاش کنید.",
-        )
