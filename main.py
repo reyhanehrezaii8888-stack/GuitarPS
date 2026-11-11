@@ -60,21 +60,23 @@ if AVALAI_API_KEY:
 
 # ---------- Database schema (only what phase 1 needs) ----------
 SCHEMA = """
-CREATE TABLE IF NOT EXISTS guitarps_phone_users (
-    phone TEXT PRIMARY KEY,
-    success_count INTEGER NOT NULL DEFAULT 0,
-    created_at INTEGER NOT NULL
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    phone TEXT UNIQUE,
+    email TEXT UNIQUE,
+    hashed_password TEXT,
+    created_at DATETIME
 );
-CREATE TABLE IF NOT EXISTS guitarps_otps (
-    phone TEXT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS otp_challenges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    phone TEXT UNIQUE,
     code_hash TEXT NOT NULL,
-    expires_at INTEGER NOT NULL,
-    sent_at INTEGER NOT NULL,
-    attempts INTEGER NOT NULL DEFAULT 0,
-    window_start INTEGER NOT NULL,
-    sent_in_window INTEGER NOT NULL DEFAULT 0
+    expires_at DATETIME NOT NULL,
+    sent_at DATETIME NOT NULL,
+    attempts INTEGER DEFAULT 0
 );
 """
+
 
 
 def init_db():
@@ -159,7 +161,7 @@ def get_current_user(
     conn = get_conn()
     try:
         row = conn.execute(
-            "SELECT phone, success_count FROM guitarps_phone_users WHERE phone = ?",
+            "SELECT phone, success_count FROM users WHERE phone = ?",
             (phone,),
         ).fetchone()
     finally:
@@ -296,7 +298,7 @@ def verify_otp(data: VerifyInput):
 
         conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
         conn.execute(
-            "INSERT OR IGNORE INTO guitarps_phone_users (phone, success_count, created_at) VALUES (?, 0, ?)",
+            "INSERT OR IGNORE INTO users (phone, success_count, created_at) VALUES (?, 0, ?)",
             (phone, now),
         )
         conn.commit()
@@ -354,7 +356,7 @@ def analyze(problem_data: ProblemInput, user: dict = Depends(get_current_user)):
     try:
         conn.execute("BEGIN IMMEDIATE")
         row = conn.execute(
-            "SELECT success_count FROM guitarps_phone_users WHERE phone = ?",
+            "SELECT success_count FROM users WHERE phone = ?",
             (phone,),
         ).fetchone()
         success_count = row["success_count"] if row else 0
@@ -382,7 +384,7 @@ def analyze(problem_data: ProblemInput, user: dict = Depends(get_current_user)):
             raise HTTPException(status_code=502, detail="خطا در ارتباط با سرویس هوش مصنوعی.")
 
         conn.execute(
-            "UPDATE guitarps_phone_users SET success_count = success_count + 1 WHERE phone = ?",
+            "UPDATE users SET success_count = success_count + 1 WHERE phone = ?",
             (phone,),
         )
         conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
