@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse
 import os
 import re
 import secrets
@@ -191,6 +192,8 @@ def get_current_user(
 # ---------------------------------------------------------------
 @app.get("/")
 def read_root():
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
     return {"status": "success", "message": "GuitarPS Backend is running smoothly!"}
 
 
