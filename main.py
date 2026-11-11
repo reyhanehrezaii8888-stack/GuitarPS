@@ -108,6 +108,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=401, detail="User not found")
     return phone
 
+
 # ---------- Routes ----------
 @app.get("/health")
 def health_check():
