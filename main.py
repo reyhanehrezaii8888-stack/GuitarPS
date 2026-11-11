@@ -1,8 +1,6 @@
 import os
 import re
 import secrets
-import hmac
-import hashlib
 import logging
 import sqlite3
 import time
@@ -10,7 +8,7 @@ from datetime import datetime, timezone
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from openai import OpenAI
 import jwt
 from dotenv import load_dotenv
@@ -31,7 +29,7 @@ app.add_middleware(
 )
 
 # ---------- Config ----------
-JWT_SECRET = os.getenv("JWT_SECRET", secrets.token_hex(32))
+JWT_SECRET = os.getenv("JWT_SECRET", "guitarps-fallback-secret-key-32chars")
 JWT_ALGORITHM = "HS256"
 AVALAI_API_KEY = os.getenv("AVALAI_API_KEY", "")
 AVALAI_BASE_URL = os.getenv("AVALAI_BASE_URL", "https://api.avalai.ir/v1")
@@ -90,14 +88,15 @@ def create_access_token(phone: str) -> str:
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
     token = credentials.credentials
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        phone: str = payload.get("sub")
+        phone = payload.get("sub")
         if not phone:
             raise HTTPException(status_code=401, detail="Invalid authentication token")
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
-    
+
     conn = get_db()
     row = conn.execute(
         "SELECT phone, success_count FROM guitarps_phone_users WHERE phone = ?",
@@ -128,7 +127,7 @@ def request_otp(data: OTPRequest):
     conn.commit()
     conn.close()
 
-    # In phase 1, log OTP code for easy testing via Liara console logs
+    # در فاز اول، کد لاگ می‌شود تا از پنل لاگ لیارا قابل مشاهده باشد
     logger.info(f"OTP for {phone}: {code}")
     
     return {"status": "success", "message": "OTP sent successfully", "debug_code": code}
@@ -148,10 +147,8 @@ def verify_otp(data: OTPVerify):
         conn.close()
         raise HTTPException(status_code=400, detail="Invalid or expired OTP code")
 
-    # Clear OTP
     conn.execute("DELETE FROM guitarps_otps WHERE phone = ?", (phone,))
     
-    # Register or ensure user exists in guitarps_phone_users
     now = datetime.now(timezone.utc).isoformat()
     conn.execute(
         "INSERT OR IGNORE INTO guitarps_phone_users (phone, success_count, created_at) VALUES (?, 0, ?)",
@@ -181,18 +178,22 @@ def analyze_guitar_problem(data: AnalyzeRequest, phone: str = Depends(get_curren
     conn.close()
 
     prompt = f"""
-شما یک استاد متخصص و صمیمی گیتار هستید که به هنرجویان مبتدی کمک می‌کنید.
-مشکل هنرجو این است: "{data.problem}"
+شما یک استاد متخصص و دلسوز گیتار هستید که به هنرجویان مبتدی کمک می‌کنید.
+مشکل هنرجو: "{data.problem}"
 
-پاسخ خود را دقیقاً در سه بخش با ساختار زیر ارائه دهید:
-۱. **توضیح مشکل:** دلیل علمی و ساده‌ی بروز این مشکل چیست.
-۲. **تمرین عملی:** یک تمرین گیتار قدم‌به‌قدم برای رفع این مشکل.
-۳. **ابزار مرتبط:** معرفی یک ابزار یا منبع مناسب (مثلاً مترونوم، تیونر گیتار، یا کوردس).
+پاسخ را دقیقاً در ۳ بخش با قالب زیر بنویسید:
+۱. **توضیح مشکل:** دلیل فیزیکی یا تکنیکی بروز این مشکل به زبان ساده.
+۲. **تمرین عملی:** یک تمرین مشخص و گام‌به‌گام با مدت زمان تمرین روزانه برای حل مشکل.
+۳. **ابزار مرتبط با لینک معتبر:** متناسب با مشکل یکی از این ابزارها را با لینک معتبر پیشنهاد بده:
+- تیونر آنلاین: https://tuner.ninja
+- مترونوم آنلاین: https://metronome-online.com
+- دیاگرام آکوردها و گیتار: https://www.ultimate-guitar.com
+از ایجاد لینک‌های ناشناخته پرهیز کن و حتماً یکی از لینک‌های معتبر بالا را در متن بیاور.
 """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini", # یا مدل پیش‌فرض AvalAI
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are an expert guitar teacher helping beginners."},
                 {"role": "user", "content": prompt}
@@ -203,9 +204,8 @@ def analyze_guitar_problem(data: AnalyzeRequest, phone: str = Depends(get_curren
         ai_analysis = response.choices[0].message.content
     except Exception as e:
         logger.error(f"AvalAI error: {str(e)}")
-        raise HTTPException(status_code=502, detail=f"خطا در ارتباط با هوش مصنوعی: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"خطا در ارتباط با سرویس هوش مصنوعی: {str(e)}")
 
-    # Increment success count
     conn = get_db()
     conn.execute(
         "UPDATE guitarps_phone_users SET success_count = success_count + 1 WHERE phone = ?",
