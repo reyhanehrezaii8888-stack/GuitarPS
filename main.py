@@ -5,10 +5,11 @@ import secrets
 import logging
 import sqlite3
 import time
+import requests
 from datetime import datetime, timezone, timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, Field
 from openai import OpenAI
 import jwt
@@ -30,7 +31,7 @@ app.add_middleware(
 )
 
 # ---------------------------------------------------------------
-# تنظیمات اصلی
+# تنظیمات اصلی، sms.ir و ادمین
 # ---------------------------------------------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
 JWT_ALGORITHM = "HS256"
@@ -38,15 +39,21 @@ JWT_EXPIRE_MINUTES = 60 * 24 * 7  # 7 روز
 
 AVALAI_BASE_URL = "https://api.avalai.ir/v1"
 
+SMS_IR_API_KEY = os.getenv("SMS_IR_API_KEY", "")
+SMS_IR_TEMPLATE_ID = os.getenv("SMS_IR_TEMPLATE_ID", "")
+
+# اطلاعات ورود به پنل ادمین (قابل تنظیم در متغیرهای محیطی لیارا)
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "یک")
+
 # ---------------------------------------------------------------
-# مسیر دیتابیس SQLite (روی پوشه موقت قابل نوشتن /tmp در لیارا)
+# مسیر دیتابیس SQLite
 # ---------------------------------------------------------------
 DB_FILE = os.getenv("DB_PATH", "/tmp/guitarps.db")
 MAX_FREE_ANALYSES = 3
 
 
 def get_db_connection() -> sqlite3.Connection:
-    """اتصال امن به SQLite با ساخت خودکار پوشه در صورت نیاز"""
     db_dir = os.path.dirname(os.path.abspath(DB_FILE))
     try:
         os.makedirs(db_dir, exist_ok=True)
@@ -58,7 +65,6 @@ def get_db_connection() -> sqlite3.Connection:
 
 
 def init_db() -> None:
-    """ایجاد جدول‌های موردنیاز در اولین راه‌اندازی"""
     conn = get_db_connection()
     try:
         cur = conn.cursor()
@@ -94,9 +100,6 @@ def on_startup() -> None:
     init_db()
 
 
-# ---------------------------------------------------------------
-# کلاینت AvalAI / OpenAI
-# ---------------------------------------------------------------
 def get_ai_client() -> OpenAI:
     api_key = os.getenv("AVALAI_API_KEY", "").strip()
     if not api_key:
@@ -107,9 +110,6 @@ def get_ai_client() -> OpenAI:
     return OpenAI(api_key=api_key, base_url=AVALAI_BASE_URL)
 
 
-# ---------------------------------------------------------------
-# مدل‌های داده (Pydantic Schemas)
-# ---------------------------------------------------------------
 class OTPRequestIn(BaseModel):
     phone: str = Field(..., min_length=10, max_length=15)
 
@@ -129,14 +129,11 @@ class TokenOut(BaseModel):
     remaining_analyses: int
 
 
-# ---------------------------------------------------------------
-# توابع کمکی و احراز هویت
-# ---------------------------------------------------------------
 security = HTTPBearer(auto_error=False)
+security_basic = HTTPBasic()
 
 
 def normalize_phone(phone: str) -> str:
-    """استانداردسازی شماره موبایل (تبدیل به فرمت ۱۱ رقمی شروع شونده با 09)"""
     digits = re.sub(r"\D", "", phone)
     if digits.startswith("0098"):
         digits = digits[4:]
@@ -147,7 +144,7 @@ def normalize_phone(phone: str) -> str:
     return digits
 
 
-def create_access_token(phone: str) -> str:
+def create_secret-75e033a7(phone: str) -> str:
     payload = {
         "sub": phone,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES),
@@ -187,14 +184,43 @@ def get_current_user(
     return phone
 
 
-# ---------------------------------------------------------------
-# اندپوینت‌های اصلی برنامه (API Routes)
-# ---------------------------------------------------------------
+# تابع بررسی دسترسی ادمین
+def verify_admin(credentials: HTTPBasicCredentials = Depends(security_basic)):
+    correct_username = secrets.compare_digest(credentials.username, ADMIN_USERNAME)
+    correct_password = secrets.compare_digest(credentials.password, ADMIN_PASSWORD)
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="نام کاربری یا رمز عبور ادمین اشتباه است",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+
 @app.get("/")
 def read_root():
     if os.path.exists("index.html"):
         return FileResponse("index.html")
     return {"status": "success", "message": "GuitarPS Backend is running smoothly!"}
+
+
+# ---------------------------------------------------------------
+# اندپوینت ادمین برای دیدن کاربران ثبت‌نام شده
+# ---------------------------------------------------------------
+@app.get("/api/admin/users")
+def get_admin_users(admin: str = Depends(verify_admin)):
+    conn = get_db_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT id, phone, used_analyses, created_at FROM users ORDER BY id DESC")
+        rows = [dict(row) for row in cur.fetchall()]
+    finally:
+        conn.close()
+    return {
+        "status": "success",
+        "total_users": len(rows),
+        "users": rows
+    }
 
 
 @app.post("/api/auth/otp/request")
@@ -212,7 +238,6 @@ def request_otp(payload: OTPRequestIn):
     conn = get_db_connection()
     try:
         cur = conn.cursor()
-        # غیرفعال کردن کدهای قبلی همین شماره
         cur.execute(
             "UPDATE otp_codes SET consumed = 1 WHERE phone = ? AND consumed = 0",
             (phone,),
@@ -231,12 +256,32 @@ def request_otp(payload: OTPRequestIn):
     finally:
         conn.close()
 
-    # چاپ کد در لاگ برای فاز تست و توسعه
+    # ارسال واقعی پیامک از طریق sms.ir
+    if SMS_IR_API_KEY and SMS_IR_TEMPLATE_ID:
+        try:
+            sms_url = "https://api.sms.ir/v1/send/verify"
+            sms_payload = {
+                "mobile": phone,
+                "templateId": int(SMS_IR_TEMPLATE_ID),
+                "parameters": [
+                    {"name": "Code", "value": code}
+                ]
+            }
+            sms_headers = {
+                "X-API-KEY": SMS_IR_API_KEY,
+                "Content-Type": "application/json"
+            }
+            res = requests.post(sms_url, json=sms_payload, headers=sms_headers, timeout=10)
+            res_data = res.json()
+            if res.status_code != 200 or not res_data.get("status"):
+                logger.error("sms.ir error: %s", res.text)
+        except Exception as e:
+            logger.exception("Failed to send SMS via sms.ir")
+
     logger.info("Generated OTP for %s -> %s", phone, code)
     return {
         "status": "success",
         "message": "کد تایید با موفقیت ارسال شد",
-        "debug_code": code,  # در نسخه پروداکشن واقعی برداشته می‌شود
     }
 
 
@@ -267,10 +312,8 @@ def verify_otp(payload: OTPVerifyIn):
                 detail="کد تایید منقضی شده است",
             )
 
-        # مصرف کد تایید
         cur.execute("UPDATE otp_codes SET consumed = 1 WHERE id = ?", (row["id"],))
         
-        # ثبت‌نام کاربر در صورت عدم حضور
         cur.execute(
             "INSERT OR IGNORE INTO users (phone, used_analyses, created_at) VALUES (?, 0, ?)",
             (phone, datetime.now(timezone.utc).isoformat()),
@@ -281,7 +324,7 @@ def verify_otp(payload: OTPVerifyIn):
     finally:
         conn.close()
 
-    access_token = create_access_token(phone)
+    access_token = create_secret-75e033a7(phone)
     return TokenOut(
         access_token=access_token,
         remaining_analyses=max(0, MAX_FREE_ANALYSES - used),
@@ -337,7 +380,6 @@ def analyze_problem(payload: AnalyzeIn, phone: str = Depends(get_current_user)):
             detail="خطا در ارتباط با هوش مصنوعی AvalAI. لطفا مجدد تلاش کنید",
         )
 
-    # افزایش شمارنده تحلیل‌های موفق کاربر
     conn = get_db_connection()
     try:
         cur = conn.cursor()
