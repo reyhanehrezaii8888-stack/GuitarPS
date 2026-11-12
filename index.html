@@ -10,343 +10,265 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Vazirmatn', sans-serif;
-    }
+    body { font-family: 'Vazirmatn', sans-serif; }
+    /* انیمیشن برای ورود نرم منوی موبایل */
+    .mobile-menu-enter { transform: translateX(100%); transition: transform 0.3s ease-out; }
+    .mobile-menu-enter-active { transform: translateX(0); }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white overflow-x-hidden">
 
   <!-- Header / Navbar -->
   <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-6xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
-      <!-- Logo -->
-      <div class="flex items-center gap-2.5 cursor-pointer shrink-0" onclick="switchTab('home')">
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-          <span class="text-lg sm:text-xl">🎸</span>
-        </div>
-        <div>
-          <span class="text-base sm:text-lg font-black tracking-tight text-white block leading-none sm:leading-tight">GuitarPS</span>
-          <span class="text-[9px] sm:text-[10px] text-indigo-400 font-medium hidden xs:block">مربی هوشمند گیتار</span>
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Hamburger (Mobile) -->
+      <div class="flex items-center gap-3">
+        <!-- Hamburger Button (Mobile Only) -->
+        <button id="hamburger-btn" type="button" onclick="toggleMobileMenu(true)" class="md:hidden p-2 -mr-2 text-slate-300 hover:text-white" aria-label="Open Menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+
+        <!-- Logo -->
+        <div class="flex items-center gap-2.5 cursor-pointer shrink-0" onclick="switchTab('home')">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+            <span class="text-lg sm:text-xl">🎸</span>
+          </div>
+          <div class="hidden xs:block">
+            <span class="text-base sm:text-lg font-black tracking-tight text-white block leading-none">GuitarPS</span>
+            <span class="text-[9px] text-indigo-400 font-medium">مربی هوشمند گیتار</span>
+          </div>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="flex items-center gap-0.5 sm:gap-2">
-        <button id="nav-home" type="button" onclick="switchTab('home')" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition text-indigo-400 bg-slate-800">
-          خانه
-        </button>
-        <button id="nav-solve" type="button" onclick="switchTab('solve')" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
-          رفع اشکال
-        </button>
-        <button id="nav-about" type="button" onclick="switchTab('about')" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
-          درباره
-        </button>
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-1">
+        <button onclick="switchTab('home')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-800" id="nav-home">خانه</button>
+        <button onclick="switchTab('solve')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-solve">رفع اشکال</button>
+        <button onclick="switchTab('about')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-about">درباره ما</button>
+        <button onclick="switchTab('plans')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-plans">پلن‌ها</button>
+        <button onclick="switchTab('contact')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-contact">تماس با ما</button>
       </nav>
 
-      <!-- User Auth State Button -->
-      <div id="auth-nav-container" class="shrink-0">
-        <button id="open-auth-btn" type="button" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-2.5 sm:px-3.5 py-1.5 rounded-lg transition font-medium">
-          ورود / ثبت‌نام
-        </button>
+      <!-- Auth Button -->
+      <div id="auth-nav-container">
+        <button onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg transition font-medium">ورود / ثبت‌نام</button>
       </div>
     </div>
   </header>
 
-  <!-- Notification Banner -->
-  <div id="toast" style="display: none;" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl transition duration-300 flex items-center gap-2 max-w-[90%] text-center"></div>
-
-  <!-- Main Content Area -->
-  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-6 sm:py-8">
-
-    <!-- 1. HOME TAB -->
-    <section id="tab-home" style="display: block;" class="space-y-10 sm:space-y-12 py-4 sm:py-6">
-      <div class="text-center space-y-4 sm:space-y-5 max-w-2xl mx-auto pt-4 sm:pt-6">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
-          <span>✨</span> اولین پلتفرم هوشمند رفع چالش‌های نوازندگی گیتار
-        </div>
-        <h1 class="text-2xl xs:text-3xl sm:text-5xl font-black text-white leading-snug sm:leading-tight">
-          صدای شفاف، تکنیک درست؛ <br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-sky-300">با مربی هوشمند GuitarPS</span>
-        </h1>
-        <p class="text-slate-400 text-xs sm:text-base leading-relaxed px-2">
-          فرقی نمی‌کند کجای مسیر یادگیری گیتار هستی؛ اگر در گرفتن باره‌ها گز می‌شنوی، دستت خسته می‌شود یا سرعتت بالا نمی‌رود، مشکلت را بنویس تا یک تمرین کاربردی و ابزار تایید شده دریافت کنی.
-        </p>
-        <div class="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          <button type="button" onclick="switchTab('solve')" class="w-full sm:w-auto px-7 py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition transform active:scale-95 text-sm sm:text-base">
-            شروع رفع اشکال گیتار
-          </button>
-          <button type="button" onclick="switchTab('about')" class="w-full sm:w-auto px-6 py-3 sm:py-3.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-medium rounded-xl border border-slate-700 transition text-xs sm:text-sm">
-            درباره این اپلیکیشن
-          </button>
-        </div>
+  <!-- Mobile Drawer Menu (Sidebar) -->
+  <div id="mobile-menu-overlay" onclick="toggleMobileMenu(false)" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
+  <aside id="mobile-menu" class="fixed top-0 right-0 bottom-0 z-50 w-72 bg-slate-900 border-l border-slate-800 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+    <div class="p-6 space-y-6">
+      <div class="flex items-center justify-between">
+        <span class="text-xl font-black text-white">GuitarPS</span>
+        <button onclick="toggleMobileMenu(false)" class="text-slate-400">✕</button>
       </div>
+      <nav class="flex flex-col gap-2">
+        <button onclick="switchTab('home'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-indigo-400 bg-slate-800/50 font-bold">خانه</button>
+        <button onclick="switchTab('solve'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">رفع اشکال</button>
+        <button onclick="switchTab('about'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">درباره ما</button>
+        <button onclick="switchTab('plans'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">پلن‌ها</button>
+        <button onclick="switchTab('contact'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">تماس با ما</button>
+      </nav>
+    </div>
+  </aside>
 
-      <!-- Feature Highlights -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-10">
-        <div class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
-          <div class="text-2xl mb-3">🔍</div>
-          <h3 class="text-base font-bold text-white mb-2">ریشه‌یابی مکانیکی چالش</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">به جای کلی‌گویی، زاویه مچ دست، فشار انگشتان و حالت شست پشت دسته ساز شما بررسی و تحلیل می‌شود.</p>
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
+    
+    <!-- TABS -->
+    <!-- HOME -->
+    <section id="tab-home" class="space-y-12 block">
+        <div class="text-center space-y-5 max-w-2xl mx-auto pt-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">✨ اولین پلتفرم هوشمند رفع چالش‌های نوازندگی</div>
+            <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight">صدای شفاف، تکنیک درست؛ <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-sky-300">با مربی هوشمند GuitarPS</span></h1>
+            <p class="text-slate-400 text-sm sm:text-base leading-relaxed">مشکلت را بنویس تا یک تمرین کاربردی و ابزار تایید شده دریافت کنی.</p>
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="switchTab('solve')" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition">شروع رفع اشکال</button>
+            </div>
         </div>
-        <div class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
-          <div class="text-2xl mb-3">🎯</div>
-          <h3 class="text-base font-bold text-white mb-2">تمرین مشخص روزانه</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">یک تمرین متمرکز و گام‌به‌گام همراه با سرعت مترونوم پیشنهادی برای اصلاح و جا افتادن تکنیک دریافت می‌کنید.</p>
-        </div>
-        <div class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition sm:col-span-2 md:col-span-1">
-          <div class="text-2xl mb-3">🛠️</div>
-          <h3 class="text-base font-bold text-white mb-2">ابزارهای تایید شده</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">معرفی مستقیم مترونوم، تیونر یا ابزارهای استاندارد با لینک معتبر جهت اجرای دقیق تمرین.</p>
-        </div>
-      </div>
     </section>
 
-    <!-- 2. SOLVE TAB -->
-    <section id="tab-solve" style="display: none;" class="space-y-6 sm:space-y-8">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl relative overflow-hidden">
-        <div class="space-y-2 sm:space-y-3 mb-5 sm:mb-6">
-          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-            <span>🎸</span> رفع اشکال با مربی همراه
-          </h2>
-          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-            مشکل تکنیکی یا سؤالت را دقیق بنویس (مثلاً: «وقتی آکورد فا ماژور رو باره می‌گیرم سیم ۳ صدای گز میده و مچم درد میگیره»).
-          </p>
-        </div>
-
-        <div class="space-y-4">
-          <textarea id="problem-input" rows="4" placeholder="توضیح مشکل شما در نوازندگی گیتار..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-3.5 sm:p-4 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition resize-none text-xs sm:text-sm"></textarea>
-
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-            <span class="text-[11px] sm:text-xs text-slate-500 text-center sm:text-right">هر کاربر دارای ۳ تحلیل رایگان در این مرحله می‌باشد.</span>
-            <button id="analyze-btn" type="button" onclick="handleAnalyzeClick()" class="w-full sm:w-auto px-6 sm:px-7 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 active:scale-95 text-xs sm:text-sm">
-              <span>تحلیل مشکل و دریافت تمرین</span>
-              <svg id="btn-spinner" class="hidden animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+    <!-- SOLVE -->
+    <section id="tab-solve" class="hidden space-y-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <h2 class="text-xl font-bold mb-4">🎸 رفع اشکال هوشمند</h2>
+            <textarea id="problem-input" rows="4" placeholder="مثلاً: سیم ۴ موقع باره گرفتن گز می‌دهد..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-white focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+            <button onclick="handleAnalyzeClick()" id="analyze-btn" class="mt-4 w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
+                تحلیل و دریافت تمرین
+                <svg id="btn-spinner" class="hidden animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
             </button>
-          </div>
         </div>
-      </div>
-
-      <!-- Analysis Result Area -->
-      <div id="result-area" style="display: none;" class="space-y-5 sm:space-y-6">
-        <h3 class="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
-          <span>📋</span> برنامه پیشنهادی مربی
-        </h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-          <!-- Part 1: Diagnosis -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
-            <div>
-              <span class="text-[11px] sm:text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md mb-2.5 sm:mb-3 inline-block">۱. ریشه مشکل</span>
-              <h4 class="font-semibold text-white text-sm sm:text-base mb-1.5 sm:mb-2">علت‌یابی تکنیکی</h4>
-              <p id="res-explanation" class="text-slate-300 text-xs sm:text-sm leading-relaxed"></p>
+        <div id="result-area" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span class="text-xs font-bold text-indigo-400 mb-2 block">۱. ریشه مشکل</span>
+                <p id="res-explanation" class="text-slate-300 text-sm leading-relaxed"></p>
             </div>
-          </div>
-
-          <!-- Part 2: Exercise -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
-            <div>
-              <span class="text-[11px] sm:text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md mb-2.5 sm:mb-3 inline-block">۲. تمرین تجویزی</span>
-              <h4 class="font-semibold text-white text-sm sm:text-base mb-1.5 sm:mb-2">روش تمرین روزانه</h4>
-              <p id="res-exercise" class="text-slate-300 text-xs sm:text-sm leading-relaxed"></p>
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+                <span class="text-xs font-bold text-emerald-400 mb-2 block">۲. تمرین تجویزی</span>
+                <p id="res-exercise" class="text-slate-300 text-sm leading-relaxed"></p>
             </div>
-          </div>
-
-          <!-- Part 3: Tool -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
-            <div>
-              <span class="text-[11px] sm:text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md mb-2.5 sm:mb-3 inline-block">۳. ابزار کمکی</span>
-              <h4 id="res-tool-name" class="font-semibold text-white text-sm sm:text-base mb-1.5 sm:mb-2">ابزار مرتبط</h4>
-              <p id="res-tool-desc" class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4"></p>
+            <div id="res-tool-part" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold text-sky-400 mb-2 block">۳. ابزار کمکی</span>
+                    <h4 id="res-tool-name" class="font-bold text-white mb-2"></h4>
+                    <p id="res-tool-desc" class="text-slate-300 text-sm leading-relaxed mb-4"></p>
+                </div>
+                <a id="res-tool-link" href="#" target="_blank" class="block text-center py-2 bg-slate-800 text-indigo-300 rounded-lg text-xs font-bold transition hover:bg-slate-700">دانلود ابزار</a>
             </div>
-            <a id="res-tool-link" href="#" target="_blank" rel="noopener noreferrer" class="block text-center w-full py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500/40 text-indigo-300 rounded-xl text-xs font-bold transition">
-              مشاهده / دانلود ابزار
-            </a>
-          </div>
         </div>
-      </div>
     </section>
 
-    <!-- 3. ABOUT TAB -->
-    <section id="tab-about" style="display: none;" class="max-w-3xl mx-auto space-y-6 sm:space-y-8 py-2 sm:py-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 space-y-5 sm:space-y-6">
-        <h2 class="text-xl sm:text-2xl font-black text-white">درباره GuitarPS</h2>
-        <div class="space-y-3.5 sm:space-y-4 text-slate-300 text-xs sm:text-base leading-relaxed">
-          <p>
-            سلام! من ریحانه هستم. در طی سال‌های تدریس و تعامل مداوم با هنرجویان و علاقه‌مندان گیتار متوجه شدم اکثر افراد موقع تمرین در منزل به دلیل ابهامات تکنیکی، درد مچ یا گز زدن سیم‌ها خسته شده و انگیزه خود را از دست می‌دهند.
-          </p>
-          <p>
-            پلتفرم <strong class="text-indigo-400">GuitarPS</strong> به عنوان یک مربی همراه هوشمند در کنار شماست تا با تحلیل دقیق زاویه دست و مکانیک نوازندگی، دلیل اصلی مشکل را برایتان روشن کند و یک تمرین کاربردی و ابزار تایید شده در اختیارتان بگذارد.
-          </p>
-          <div class="p-3.5 sm:p-4 rounded-xl bg-slate-950 border border-slate-800 text-[11px] sm:text-xs text-slate-400 space-y-1">
-            <p>• توسعه داده شده برای جامعه نوازندگان گیتار</p>
-            <p>• ارتباط و پشتیبانی: پیج آموزش گیتار</p>
-          </div>
+    <!-- ABOUT -->
+    <section id="tab-about" class="hidden max-w-3xl mx-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6">
+            <h2 class="text-2xl font-black">درباره GuitarPS</h2>
+            <p class="text-slate-300 leading-relaxed">سلام! من ریحانه هستم. GuitarPS طراحی شده تا مربی همراه شما در خانه باشد و با تحلیل تکنیک‌ها، مسیر یادگیری را لذت‌بخش‌تر کند.</p>
         </div>
-      </div>
+    </section>
+
+    <!-- PLANS (New Section) -->
+    <section id="tab-plans" class="hidden space-y-8">
+        <h2 class="text-3xl font-black text-center">انتخاب پلن اشتراک</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-center">
+                <h3 class="text-xl font-bold">پلن رایگان</h3>
+                <p class="text-3xl font-black my-4">۰ <span class="text-sm font-normal">تومان</span></p>
+                <ul class="text-slate-400 text-sm space-y-2 mb-6"><li>۳ تحلیل هوشمند</li><li>دسترسی به تمرینات پایه</li></ul>
+                <button disabled class="w-full py-3 bg-slate-800 text-slate-500 rounded-xl font-bold">فعال شده</button>
+            </div>
+            <div class="bg-slate-900 border-2 border-indigo-500 p-8 rounded-3xl text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[10px] px-3 py-1 font-bold">ویژه</div>
+                <h3 class="text-xl font-bold text-indigo-400">پلن نامحدود (ماهانه)</h3>
+                <p class="text-3xl font-black my-4 text-white">۱۰۰,۰۰۰ <span class="text-sm font-normal">تومان</span></p>
+                <ul class="text-slate-300 text-sm space-y-2 mb-6"><li>تحلیل نامحدود</li><li>دسترسی به تمام ابزارها</li><li>پشتیبانی اولویت‌دار</li></ul>
+                <button class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition">خرید اشتراک</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT (New Section) -->
+    <section id="tab-contact" class="hidden max-w-2xl mx-auto text-center space-y-6">
+        <h2 class="text-3xl font-black">تماس با ما</h2>
+        <p class="text-slate-400">برای پشتیبانی یا سوالات در مورد دوره‌ها، از طریق راه‌های زیر با ما در ارتباط باشید.</p>
+        <div class="flex flex-col gap-4">
+            <a href="#" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-indigo-500 transition">
+                <span class="block text-indigo-400 font-bold mb-1">اینستاگرام</span>
+                <span class="text-sm">پیج آموزش گیتار ریحانه</span>
+            </a>
+            <a href="mailto:info@guitarps.ir" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-indigo-500 transition">
+                <span class="block text-indigo-400 font-bold mb-1">ایمیل</span>
+                <span class="text-sm">info@guitarps.ir</span>
+            </a>
+        </div>
     </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-900 bg-slate-950 py-5 sm:py-6 text-center text-[11px] sm:text-xs text-slate-500 px-4">
-    پلتفرم GuitarPS © ۱۴۰۵ - مربی همراه و رفع اشکال هوشمند گیتار
+  <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-xs text-slate-600">
+    پلتفرم GuitarPS © ۱۴۰۵ - مربی هوشمند و رفع اشکال گیتار
   </footer>
 
-  <!-- AUTH MODAL (Blurred Overlay) -->
-  <div id="auth-modal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md transition">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 relative">
-      <button type="button" onclick="closeAuthModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">✕</button>
-      
-      <div class="text-center space-y-1">
-        <div class="w-11 h-11 sm:w-12 sm:h-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-lg sm:text-xl mb-2">
-          📱
-        </div>
-        <h3 class="text-base sm:text-lg font-bold text-white">ورود سریع با شماره تماس</h3>
-        <p class="text-[11px] sm:text-xs text-slate-400">برای حفظ سهمیه تحلیل و دریافت نتیجه وارد شوید.</p>
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-slate-400">✕</button>
+      <div class="text-center space-y-4">
+        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-xl">📱</div>
+        <h3 class="text-lg font-bold">ورود با شماره موبایل</h3>
       </div>
-
-      <!-- Step 1: Request OTP -->
-      <div id="auth-step-phone" class="space-y-3.5 sm:space-y-4">
-        <div>
-          <label class="block text-[11px] sm:text-xs font-medium text-slate-300 mb-1.5">شماره موبایل</label>
-          <input id="phone-input" type="tel" dir="ltr" placeholder="09123456789" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs sm:text-sm tracking-wider" />
-        </div>
-        <button id="send-otp-btn" type="button" onclick="sendOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition text-xs sm:text-sm shadow-lg shadow-indigo-600/20">
-          دریافت کد تایید
-        </button>
+      <!-- Step 1 -->
+      <div id="auth-step-phone" class="mt-6 space-y-4">
+        <input id="phone-input" type="tel" dir="ltr" placeholder="09123456789" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-white focus:outline-none focus:border-indigo-500 tracking-wider" />
+        <button id="send-otp-btn" onclick="sendOtp()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg">دریافت کد تایید</button>
       </div>
-
-      <!-- Step 2: Verify OTP -->
-      <div id="auth-step-otp" style="display: none;" class="space-y-3.5 sm:space-y-4">
-        <div>
-          <label class="block text-[11px] sm:text-xs font-medium text-slate-300 mb-1.5">کد تایید پیامک شده</label>
-          <input id="otp-input" type="text" dir="ltr" placeholder="1234" maxlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-base sm:text-lg tracking-widest font-mono" />
-        </div>
-        <button id="verify-otp-btn" type="button" onclick="verifyOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition text-xs sm:text-sm shadow-lg shadow-indigo-600/20">
-          تایید و ادامه
-        </button>
-        <button type="button" onclick="backToPhoneStep()" class="w-full text-[11px] sm:text-xs text-slate-500 hover:text-slate-300">
-          تغییر شماره تماس
-        </button>
+      <!-- Step 2 -->
+      <div id="auth-step-otp" style="display: none;" class="mt-6 space-y-4">
+        <input id="otp-input" type="text" dir="ltr" placeholder="1234" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-white text-xl tracking-[0.5em] font-mono" />
+        <button id="verify-otp-btn" onclick="verifyOtp()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl">تایید نهایی</button>
       </div>
-
     </div>
   </div>
 
-  <!-- Application Logic -->
+  <div id="toast" style="display: none;" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl text-sm font-bold shadow-2xl"></div>
+
+  <!-- LOGIC -->
   <script>
     const API_BASE = "https://app.guitarreyhane.ir";
 
-    function switchTab(tab) {
-      const tabs = ['home', 'solve', 'about'];
-      tabs.forEach(t => {
-        const sec = document.getElementById('tab-' + t);
-        const btn = document.getElementById('nav-' + t);
-        if (t === tab) {
-          sec.style.display = 'block';
-          btn.classList.add('text-indigo-400', 'bg-slate-800');
-          btn.classList.remove('text-slate-300');
-        } else {
-          sec.style.display = 'none';
+    function toggleMobileMenu(open) {
+      const menu = document.getElementById('mobile-menu');
+      const overlay = document.getElementById('mobile-menu-overlay');
+      if (open) {
+        menu.classList.remove('translate-x-full');
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.classList.add('opacity-100'), 10);
+      } else {
+        menu.classList.add('translate-x-full');
+        overlay.classList.remove('opacity-100');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+    }
+
+    function switchTab(tabId) {
+      const sections = ['home', 'solve', 'about', 'plans', 'contact'];
+      sections.forEach(s => {
+        document.getElementById('tab-' + s).classList.add('hidden');
+        document.getElementById('tab-' + s).classList.remove('block');
+        
+        // Update Navbar Desktop UI
+        const btn = document.getElementById('nav-' + s);
+        if(btn) {
           btn.classList.remove('text-indigo-400', 'bg-slate-800');
           btn.classList.add('text-slate-300');
         }
       });
+      
+      const target = document.getElementById('tab-' + tabId);
+      target.classList.remove('hidden');
+      target.classList.add('block');
+      
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if(activeBtn) {
+        activeBtn.classList.add('text-indigo-400', 'bg-slate-800');
+        activeBtn.classList.remove('text-slate-300');
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
       toast.innerText = msg;
-      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-xs sm:text-sm font-medium shadow-2xl transition duration-300 flex items-center gap-2 max-w-[90%] text-center ${
-        isError ? 'bg-rose-500 text-white' : 'bg-emerald-600 text-white font-bold'
-      }`;
-      toast.style.display = 'flex';
-      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl text-sm font-bold shadow-2xl ${isError ? 'bg-rose-500 text-white' : 'bg-emerald-600 text-white'}`;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    function updateAuthUI() {
-      const token = localStorage.getItem('token');
-      const container = document.getElementById('auth-nav-container');
-      if (token) {
-        container.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] sm:text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">وارد شده</span>
-            <button type="button" onclick="logout()" class="text-[11px] sm:text-xs text-slate-400 hover:text-rose-400 transition">خروج</button>
-          </div>
-        `;
-      } else {
-        container.innerHTML = `
-          <button id="open-auth-btn" type="button" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-2.5 sm:px-3.5 py-1.5 rounded-lg transition font-medium">
-            ورود / ثبت‌نام
-          </button>
-        `;
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('token');
-      updateAuthUI();
-      showToast('با موفقیت خارج شدید');
-    }
-
-    function openAuthModal() {
-      document.getElementById('auth-modal').style.display = 'flex';
-    }
-
-    function closeAuthModal() {
-      document.getElementById('auth-modal').style.display = 'none';
-    }
-
-    function backToPhoneStep() {
-      document.getElementById('auth-step-otp').style.display = 'none';
-      document.getElementById('auth-step-phone').style.display = 'block';
-    }
+    function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+    function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
 
     let activePhone = "";
-
     async function sendOtp() {
       const phone = document.getElementById('phone-input').value.trim();
-      if (!phone || phone.length < 10) {
-        showToast('لطفاً شماره موبایل معتبر وارد کنید', true);
-        return;
-      }
+      if (!phone || phone.length < 10) return showToast('شماره نامعتبر است', true);
       activePhone = phone;
-      const btn = document.getElementById('send-otp-btn');
-      btn.disabled = true;
-      btn.innerText = 'در حال ارسال...';
-
       try {
         const res = await fetch(`${API_BASE}/api/auth/otp/request`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone_number: phone })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'خطا در ارسال کد');
-        
+        if (!res.ok) throw new Error('خطا در ارسال کد');
         showToast('کد تایید ارسال شد');
         document.getElementById('auth-step-phone').style.display = 'none';
         document.getElementById('auth-step-otp').style.display = 'block';
-      } catch (err) {
-        showToast(err.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'دریافت کد تایید';
-      }
+      } catch (err) { showToast(err.message, true); }
     }
 
     async function verifyOtp() {
       const code = document.getElementById('otp-input').value.trim();
-      if (!code) {
-        showToast('لطفاً کد تایید را وارد کنید', true);
-        return;
-      }
-      const btn = document.getElementById('verify-otp-btn');
-      btn.disabled = true;
-      btn.innerText = 'در حال بررسی...';
-
       try {
         const res = await fetch(`${API_BASE}/api/auth/otp/verify`, {
           method: 'POST',
@@ -354,104 +276,56 @@
           body: JSON.stringify({ phone_number: activePhone, code: code })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'کد وارد شده نامعتبر است');
-
+        if (!res.ok) throw new Error('کد نامعتبر است');
         localStorage.setItem('token', data.access_token);
-        updateAuthUI();
-        closeAuthModal();
-        showToast('ورود با موفقیت انجام شد');
-
-        const problem = document.getElementById('problem-input').value.trim();
-        if (problem) {
-          triggerAnalyze(problem);
-        }
-      } catch (err) {
-        showToast(err.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'تایید و ادامه';
-      }
+        location.reload();
+      } catch (err) { showToast(err.message, true); }
     }
 
-    function handleAnalyzeClick() {
+    async function handleAnalyzeClick() {
       const problem = document.getElementById('problem-input').value.trim();
-      if (!problem) {
-        showToast('لطفاً ابتدا مشکل خود در گیتار را بنویسید', true);
-        return;
-      }
-
+      if (!problem) return showToast('ابتدا مشکل را بنویسید', true);
       const token = localStorage.getItem('token');
-      if (!token) {
-        openAuthModal();
-        return;
-      }
+      if (!token) return openAuthModal();
 
-      triggerAnalyze(problem);
-    }
-
-    async function triggerAnalyze(problemText) {
-      const token = localStorage.getItem('token');
       const btn = document.getElementById('analyze-btn');
       const spinner = document.getElementById('btn-spinner');
-      btn.disabled = true;
-      spinner.classList.remove('hidden');
+      btn.disabled = true; spinner.classList.remove('hidden');
 
       try {
         const res = await fetch(`${API_BASE}/api/analyze`, {
           method: 'POST',
-          headers: {
+          headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `GAPGPTMASKTOKENlg9o37gcehX0X`
+            'Authorization': `Bearer ${token}` 
           },
-          body: JSON.stringify({ problem_text: problemText })
+          body: JSON.stringify({ problem_text: problem })
         });
-
         const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'خطا در تحلیل');
 
-        if (res.status === 401) {
-          localStorage.removeItem('token');
-          updateAuthUI();
-          openAuthModal();
-          throw new Error('نشست شما منقضی شده است؛ لطفاً دوباره وارد شوید');
-        }
-
-        if (res.status === 403) {
-          throw new Error(typeof data.detail === 'string' ? data.detail : 'سهمیه ۳ تحلیل رایگان شما تمام شده است');
-        }
-
-        if (!res.ok) {
-          throw new Error(typeof data.detail === 'string' ? data.detail : 'خطا در تحلیل مشکل');
-        }
-
-        document.getElementById('res-explanation').innerText = data.explanation || 'توضیحی ثبت نشده است';
-        document.getElementById('res-exercise').innerText = data.exercise || 'تمرینی ثبت نشده است';
-        
+        document.getElementById('res-explanation').innerText = data.explanation;
+        document.getElementById('res-exercise').innerText = data.exercise;
         if (data.tool) {
-          document.getElementById('res-tool-name').innerText = data.tool.name || 'ابزار کمکی';
-          document.getElementById('res-tool-desc').innerText = data.tool.description || '';
-          const link = document.getElementById('res-tool-link');
-          link.href = data.tool.link || '#';
-          link.style.display = 'block';
-        } else {
-          document.getElementById('res-tool-link').style.display = 'none';
+            document.getElementById('res-tool-name').innerText = data.tool.name;
+            document.getElementById('res-tool-desc').innerText = data.tool.description;
+            document.getElementById('res-tool-link').href = data.tool.link;
         }
-
-        const resultArea = document.getElementById('result-area');
-        resultArea.style.display = 'block';
-        resultArea.scrollIntoView({ behavior: 'smooth' });
-        showToast('تحلیل هوشمند با موفقیت آماده شد');
-
-      } catch (err) {
-        showToast(err.message, true);
-      } finally {
-        btn.disabled = false;
-        spinner.classList.add('hidden');
-      }
+        document.getElementById('result-area').classList.remove('hidden');
+        document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+      } catch (err) { showToast(err.message, true); }
+      finally { btn.disabled = false; spinner.classList.add('hidden'); }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      updateAuthUI();
-    });
+    // بستن منو با Escape
+    document.addEventListener('keydown', (e) => { if (e.key === "Escape") toggleMobileMenu(false); });
+    
+    // نمایش وضعیت دکمه ورود
+    window.onload = () => {
+        if (localStorage.getItem('token')) {
+            document.getElementById('auth-nav-container').innerHTML = `<button onclick="localStorage.removeItem('token'); location.reload();" class="text-xs text-rose-400 font-bold">خروج</button>`;
+        }
+    };
   </script>
 </body>
 </html>
