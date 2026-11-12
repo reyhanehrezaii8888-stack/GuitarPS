@@ -49,7 +49,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "یک")
 # ---------------------------------------------------------------
 # مسیر دیتابیس SQLite
 # ---------------------------------------------------------------
-DB_FILE = os.getenv("DB_PATH", "/tmp/guitarps.db")
+DB_FILE = os.getenv("DB_PATH", "/data/guitarps.db")
 MAX_FREE_ANALYSES = 3
 
 
