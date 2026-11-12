@@ -35,14 +35,14 @@ app.add_middleware(
 # ---------------------------------------------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRE_MINUTES = 60 * 24 * 7  # 7 روز
+JWT_EXPIRE_MINUTES = 60 * 24 * 7  # ۷ روز
 
 AVALAI_BASE_URL = "https://api.avalai.ir/v1"
 
 SMS_IR_API_KEY = os.getenv("SMS_IR_API_KEY", "")
 SMS_IR_TEMPLATE_ID = os.getenv("SMS_IR_TEMPLATE_ID", "")
 
-# اطلاعات ورود به پنل ادمین (قابل تنظیم در متغیرهای محیطی لیارا)
+# اطلاعات ورود به پنل ادمین
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "یک")
 
@@ -144,7 +144,7 @@ def normalize_phone(phone: str) -> str:
     return digits
 
 
-def create_secret-75e033a7(phone: str) -> str:
+def create_access_token(phone: str) -> str:
     payload = {
         "sub": phone,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES),
@@ -184,7 +184,6 @@ def get_current_user(
     return phone
 
 
-# تابع بررسی دسترسی ادمین
 def verify_admin(credentials: HTTPBasicCredentials = Depends(security_basic)):
     correct_username = secrets.compare_digest(credentials.username, ADMIN_USERNAME)
     correct_password = secrets.compare_digest(credentials.password, ADMIN_PASSWORD)
@@ -204,9 +203,6 @@ def read_root():
     return {"status": "success", "message": "GuitarPS Backend is running smoothly!"}
 
 
-# ---------------------------------------------------------------
-# اندپوینت ادمین برای دیدن کاربران ثبت‌نام شده
-# ---------------------------------------------------------------
 @app.get("/api/admin/users")
 def get_admin_users(admin: str = Depends(verify_admin)):
     conn = get_db_connection()
@@ -247,7 +243,7 @@ def request_otp(payload: OTPRequestIn):
             (phone, code, expires_at),
         )
         conn.commit()
-    except Exception as exc:
+    except Exception:
         logger.exception("OTP save failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -256,7 +252,6 @@ def request_otp(payload: OTPRequestIn):
     finally:
         conn.close()
 
-    # ارسال واقعی پیامک از طریق sms.ir
     if SMS_IR_API_KEY and SMS_IR_TEMPLATE_ID:
         try:
             sms_url = "https://api.sms.ir/v1/send/verify"
@@ -275,7 +270,7 @@ def request_otp(payload: OTPRequestIn):
             res_data = res.json()
             if res.status_code != 200 or not res_data.get("status"):
                 logger.error("sms.ir error: %s", res.text)
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to send SMS via sms.ir")
 
     logger.info("Generated OTP for %s -> %s", phone, code)
@@ -324,9 +319,9 @@ def verify_otp(payload: OTPVerifyIn):
     finally:
         conn.close()
 
-    access_token = create_secret-75e033a7(phone)
+    token = create_access_token(phone)
     return TokenOut(
-        access_token=access_token,
+        access_token=token,
         remaining_analyses=max(0, MAX_FREE_ANALYSES - used),
     )
 
@@ -373,7 +368,7 @@ def analyze_problem(payload: AnalyzeIn, phone: str = Depends(get_current_user)):
             max_tokens=900,
         )
         answer = completion.choices[0].message.content
-    except Exception as exc:
+    except Exception:
         logger.exception("AI analysis request failed")
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
