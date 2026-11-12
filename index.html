@@ -19,33 +19,34 @@
 
   <!-- Header / Navbar -->
   <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-          <span class="text-xl">🎸</span>
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 cursor-pointer shrink-0" onclick="switchTab('home')">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <span class="text-lg sm:text-xl">🎸</span>
         </div>
         <div>
-          <span class="text-lg font-black tracking-tight text-white block">GuitarPS</span>
-          <span class="text-[10px] text-indigo-400 font-medium block">مربی هوشمند گیتار</span>
+          <span class="text-base sm:text-lg font-black tracking-tight text-white block leading-none sm:leading-tight">GuitarPS</span>
+          <span class="text-[9px] sm:text-[10px] text-indigo-400 font-medium hidden xs:block">مربی هوشمند گیتار</span>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
-      <nav class="flex items-center gap-1 sm:gap-2">
-        <button id="nav-home" type="button" onclick="switchTab('home')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-800">
+      <nav class="flex items-center gap-0.5 sm:gap-2">
+        <button id="nav-home" type="button" onclick="switchTab('home')" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition text-indigo-400 bg-slate-800">
           خانه
         </button>
-        <button id="nav-solve" type="button" onclick="switchTab('solve')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
+        <button id="nav-solve" type="button" onclick="switchTab('solve')" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
           رفع اشکال
         </button>
-        <button id="nav-about" type="button" onclick="switchTab('about')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
-          درباره اپلیکیشن
+        <button id="nav-about" type="button" onclick="switchTab('about')" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60">
+          درباره
         </button>
       </nav>
 
       <!-- User Auth State Button -->
-      <div id="auth-nav-container">
-        <button id="open-auth-btn" type="button" onclick="openAuthModal()" class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg transition font-medium">
+      <div id="auth-nav-container" class="shrink-0">
+        <button id="open-auth-btn" type="button" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-2.5 sm:px-3.5 py-1.5 rounded-lg transition font-medium">
           ورود / ثبت‌نام
         </button>
       </div>
@@ -53,47 +54,47 @@
   </header>
 
   <!-- Notification Banner -->
-  <div id="toast" style="display: none;" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl transition duration-300 flex items-center gap-2"></div>
+  <div id="toast" style="display: none;" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl transition duration-300 flex items-center gap-2 max-w-[90%] text-center"></div>
 
   <!-- Main Content Area -->
-  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-6 sm:py-8">
 
     <!-- 1. HOME TAB -->
-    <section id="tab-home" style="display: block;" class="space-y-12 py-6">
-      <div class="text-center space-y-5 max-w-2xl mx-auto pt-6">
+    <section id="tab-home" style="display: block;" class="space-y-10 sm:space-y-12 py-4 sm:py-6">
+      <div class="text-center space-y-4 sm:space-y-5 max-w-2xl mx-auto pt-4 sm:pt-6">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
           <span>✨</span> اولین پلتفرم هوشمند رفع چالش‌های نوازندگی گیتار
         </div>
-        <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight">
+        <h1 class="text-2xl xs:text-3xl sm:text-5xl font-black text-white leading-snug sm:leading-tight">
           صدای شفاف، تکنیک درست؛ <br>
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-sky-300">با مربی هوشمند GuitarPS</span>
         </h1>
-        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        <p class="text-slate-400 text-xs sm:text-base leading-relaxed px-2">
           فرقی نمی‌کند کجای مسیر یادگیری گیتار هستی؛ اگر در گرفتن باره‌ها گز می‌شنوی، دستت خسته می‌شود یا سرعتت بالا نمی‌رود، مشکلت را بنویس تا یک تمرین کاربردی و ابزار تایید شده دریافت کنی.
         </p>
-        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button type="button" onclick="switchTab('solve')" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition transform active:scale-95 text-base">
+        <div class="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <button type="button" onclick="switchTab('solve')" class="w-full sm:w-auto px-7 py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition transform active:scale-95 text-sm sm:text-base">
             شروع رفع اشکال گیتار
           </button>
-          <button type="button" onclick="switchTab('about')" class="w-full sm:w-auto px-6 py-3.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-medium rounded-xl border border-slate-700 transition text-sm">
+          <button type="button" onclick="switchTab('about')" class="w-full sm:w-auto px-6 py-3 sm:py-3.5 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-medium rounded-xl border border-slate-700 transition text-xs sm:text-sm">
             درباره این اپلیکیشن
           </button>
         </div>
       </div>
 
       <!-- Feature Highlights -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10">
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-10">
+        <div class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
           <div class="text-2xl mb-3">🔍</div>
           <h3 class="text-base font-bold text-white mb-2">ریشه‌یابی مکانیکی چالش</h3>
           <p class="text-slate-400 text-xs leading-relaxed">به جای کلی‌گویی، زاویه مچ دست، فشار انگشتان و حالت شست پشت دسته ساز شما بررسی و تحلیل می‌شود.</p>
         </div>
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
+        <div class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
           <div class="text-2xl mb-3">🎯</div>
           <h3 class="text-base font-bold text-white mb-2">تمرین مشخص روزانه</h3>
           <p class="text-slate-400 text-xs leading-relaxed">یک تمرین متمرکز و گام‌به‌گام همراه با سرعت مترونوم پیشنهادی برای اصلاح و جا افتادن تکنیک دریافت می‌کنید.</p>
         </div>
-        <div class="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition">
+        <div class="p-5 sm:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 hover:border-indigo-500/40 transition sm:col-span-2 md:col-span-1">
           <div class="text-2xl mb-3">🛠️</div>
           <h3 class="text-base font-bold text-white mb-2">ابزارهای تایید شده</h3>
           <p class="text-slate-400 text-xs leading-relaxed">معرفی مستقیم مترونوم، تیونر یا ابزارهای استاندارد با لینک معتبر جهت اجرای دقیق تمرین.</p>
@@ -102,23 +103,23 @@
     </section>
 
     <!-- 2. SOLVE TAB -->
-    <section id="tab-solve" style="display: none;" class="space-y-8">
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div class="space-y-3 mb-6">
-          <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+    <section id="tab-solve" style="display: none;" class="space-y-6 sm:space-y-8">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xl relative overflow-hidden">
+        <div class="space-y-2 sm:space-y-3 mb-5 sm:mb-6">
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
             <span>🎸</span> رفع اشکال با مربی همراه
           </h2>
-          <p class="text-slate-400 text-sm">
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
             مشکل تکنیکی یا سؤالت را دقیق بنویس (مثلاً: «وقتی آکورد فا ماژور رو باره می‌گیرم سیم ۳ صدای گز میده و مچم درد میگیره»).
           </p>
         </div>
 
         <div class="space-y-4">
-          <textarea id="problem-input" rows="4" placeholder="توضیح مشکل شما در نوازندگی گیتار..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition resize-none text-sm"></textarea>
+          <textarea id="problem-input" rows="4" placeholder="توضیح مشکل شما در نوازندگی گیتار..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-3.5 sm:p-4 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition resize-none text-xs sm:text-sm"></textarea>
 
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-            <span class="text-xs text-slate-500">هر کاربر دارای ۳ تحلیل رایگان در این مرحله می‌باشد.</span>
-            <button id="analyze-btn" type="button" onclick="handleAnalyzeClick()" class="w-full sm:w-auto px-7 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 active:scale-95 text-sm">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+            <span class="text-[11px] sm:text-xs text-slate-500 text-center sm:text-right">هر کاربر دارای ۳ تحلیل رایگان در این مرحله می‌باشد.</span>
+            <button id="analyze-btn" type="button" onclick="handleAnalyzeClick()" class="w-full sm:w-auto px-6 sm:px-7 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 active:scale-95 text-xs sm:text-sm">
               <span>تحلیل مشکل و دریافت تمرین</span>
               <svg id="btn-spinner" class="hidden animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
             </button>
@@ -127,36 +128,36 @@
       </div>
 
       <!-- Analysis Result Area -->
-      <div id="result-area" style="display: none;" class="space-y-6">
-        <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+      <div id="result-area" style="display: none;" class="space-y-5 sm:space-y-6">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
           <span>📋</span> برنامه پیشنهادی مربی
         </h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           <!-- Part 1: Diagnosis -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
             <div>
-              <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md mb-3 inline-block">۱. ریشه مشکل</span>
-              <h4 class="font-semibold text-white text-base mb-2">علت‌یابی تکنیکی</h4>
-              <p id="res-explanation" class="text-slate-300 text-sm leading-relaxed"></p>
+              <span class="text-[11px] sm:text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md mb-2.5 sm:mb-3 inline-block">۱. ریشه مشکل</span>
+              <h4 class="font-semibold text-white text-sm sm:text-base mb-1.5 sm:mb-2">علت‌یابی تکنیکی</h4>
+              <p id="res-explanation" class="text-slate-300 text-xs sm:text-sm leading-relaxed"></p>
             </div>
           </div>
 
           <!-- Part 2: Exercise -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
             <div>
-              <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md mb-3 inline-block">۲. تمرین تجویزی</span>
-              <h4 class="font-semibold text-white text-base mb-2">روش تمرین روزانه</h4>
-              <p id="res-exercise" class="text-slate-300 text-sm leading-relaxed"></p>
+              <span class="text-[11px] sm:text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md mb-2.5 sm:mb-3 inline-block">۲. تمرین تجویزی</span>
+              <h4 class="font-semibold text-white text-sm sm:text-base mb-1.5 sm:mb-2">روش تمرین روزانه</h4>
+              <p id="res-exercise" class="text-slate-300 text-xs sm:text-sm leading-relaxed"></p>
             </div>
           </div>
 
           <!-- Part 3: Tool -->
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
             <div>
-              <span class="text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md mb-3 inline-block">۳. ابزار کمکی</span>
-              <h4 id="res-tool-name" class="font-semibold text-white text-base mb-2">ابزار مرتبط</h4>
-              <p id="res-tool-desc" class="text-slate-300 text-sm leading-relaxed mb-4"></p>
+              <span class="text-[11px] sm:text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-md mb-2.5 sm:mb-3 inline-block">۳. ابزار کمکی</span>
+              <h4 id="res-tool-name" class="font-semibold text-white text-sm sm:text-base mb-1.5 sm:mb-2">ابزار مرتبط</h4>
+              <p id="res-tool-desc" class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4"></p>
             </div>
             <a id="res-tool-link" href="#" target="_blank" rel="noopener noreferrer" class="block text-center w-full py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500/40 text-indigo-300 rounded-xl text-xs font-bold transition">
               مشاهده / دانلود ابزار
@@ -167,17 +168,17 @@
     </section>
 
     <!-- 3. ABOUT TAB -->
-    <section id="tab-about" style="display: none;" class="max-w-3xl mx-auto space-y-8 py-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-        <h2 class="text-2xl font-black text-white">درباره GuitarPS</h2>
-        <div class="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+    <section id="tab-about" style="display: none;" class="max-w-3xl mx-auto space-y-6 sm:space-y-8 py-2 sm:py-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 space-y-5 sm:space-y-6">
+        <h2 class="text-xl sm:text-2xl font-black text-white">درباره GuitarPS</h2>
+        <div class="space-y-3.5 sm:space-y-4 text-slate-300 text-xs sm:text-base leading-relaxed">
           <p>
             سلام! من ریحانه هستم. در طی سال‌های تدریس و تعامل مداوم با هنرجویان و علاقه‌مندان گیتار متوجه شدم اکثر افراد موقع تمرین در منزل به دلیل ابهامات تکنیکی، درد مچ یا گز زدن سیم‌ها خسته شده و انگیزه خود را از دست می‌دهند.
           </p>
           <p>
             پلتفرم <strong class="text-indigo-400">GuitarPS</strong> به عنوان یک مربی همراه هوشمند در کنار شماست تا با تحلیل دقیق زاویه دست و مکانیک نوازندگی، دلیل اصلی مشکل را برایتان روشن کند و یک تمرین کاربردی و ابزار تایید شده در اختیارتان بگذارد.
           </p>
-          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 space-y-1">
+          <div class="p-3.5 sm:p-4 rounded-xl bg-slate-950 border border-slate-800 text-[11px] sm:text-xs text-slate-400 space-y-1">
             <p>• توسعه داده شده برای جامعه نوازندگان گیتار</p>
             <p>• ارتباط و پشتیبانی: پیج آموزش گیتار</p>
           </div>
@@ -188,44 +189,44 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
+  <footer class="border-t border-slate-900 bg-slate-950 py-5 sm:py-6 text-center text-[11px] sm:text-xs text-slate-500 px-4">
     پلتفرم GuitarPS © ۱۴۰۵ - مربی همراه و رفع اشکال هوشمند گیتار
   </footer>
 
   <!-- AUTH MODAL (Blurred Overlay) -->
   <div id="auth-modal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md transition">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-5 relative">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 relative">
       <button type="button" onclick="closeAuthModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">✕</button>
       
       <div class="text-center space-y-1">
-        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-xl mb-2">
+        <div class="w-11 h-11 sm:w-12 sm:h-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-lg sm:text-xl mb-2">
           📱
         </div>
-        <h3 class="text-lg font-bold text-white">ورود سریع با شماره تماس</h3>
-        <p class="text-xs text-slate-400">برای حفظ سهمیه تحلیل و دریافت نتیجه وارد شوید.</p>
+        <h3 class="text-base sm:text-lg font-bold text-white">ورود سریع با شماره تماس</h3>
+        <p class="text-[11px] sm:text-xs text-slate-400">برای حفظ سهمیه تحلیل و دریافت نتیجه وارد شوید.</p>
       </div>
 
       <!-- Step 1: Request OTP -->
-      <div id="auth-step-phone" class="space-y-4">
+      <div id="auth-step-phone" class="space-y-3.5 sm:space-y-4">
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">شماره موبایل</label>
-          <input id="phone-input" type="tel" dir="ltr" placeholder="09123456789" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm tracking-wider" />
+          <label class="block text-[11px] sm:text-xs font-medium text-slate-300 mb-1.5">شماره موبایل</label>
+          <input id="phone-input" type="tel" dir="ltr" placeholder="09123456789" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-xs sm:text-sm tracking-wider" />
         </div>
-        <button id="send-otp-btn" type="button" onclick="sendOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition text-sm shadow-lg shadow-indigo-600/20">
+        <button id="send-otp-btn" type="button" onclick="sendOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition text-xs sm:text-sm shadow-lg shadow-indigo-600/20">
           دریافت کد تایید
         </button>
       </div>
 
       <!-- Step 2: Verify OTP -->
-      <div id="auth-step-otp" style="display: none;" class="space-y-4">
+      <div id="auth-step-otp" style="display: none;" class="space-y-3.5 sm:space-y-4">
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1.5">کد تایید پیامک شده</label>
-          <input id="otp-input" type="text" dir="ltr" placeholder="1234" maxlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-lg tracking-widest font-mono" />
+          <label class="block text-[11px] sm:text-xs font-medium text-slate-300 mb-1.5">کد تایید پیامک شده</label>
+          <input id="otp-input" type="text" dir="ltr" placeholder="1234" maxlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-center text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-base sm:text-lg tracking-widest font-mono" />
         </div>
-        <button id="verify-otp-btn" type="button" onclick="verifyOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition text-sm shadow-lg shadow-indigo-600/20">
+        <button id="verify-otp-btn" type="button" onclick="verifyOtp()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition text-xs sm:text-sm shadow-lg shadow-indigo-600/20">
           تایید و ادامه
         </button>
-        <button type="button" onclick="backToPhoneStep()" class="w-full text-xs text-slate-500 hover:text-slate-300">
+        <button type="button" onclick="backToPhoneStep()" class="w-full text-[11px] sm:text-xs text-slate-500 hover:text-slate-300">
           تغییر شماره تماس
         </button>
       </div>
@@ -237,7 +238,6 @@
   <script>
     const API_BASE = "https://app.guitarreyhane.ir";
 
-    // Tab Switcher (Direct DOM Style - 100% Reliable)
     function switchTab(tab) {
       const tabs = ['home', 'solve', 'about'];
       tabs.forEach(t => {
@@ -256,31 +256,29 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Toast alerts
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
       toast.innerText = msg;
-      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-2xl transition duration-300 flex items-center gap-2 ${
+      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-xs sm:text-sm font-medium shadow-2xl transition duration-300 flex items-center gap-2 max-w-[90%] text-center ${
         isError ? 'bg-rose-500 text-white' : 'bg-emerald-600 text-white font-bold'
       }`;
       toast.style.display = 'flex';
       setTimeout(() => { toast.style.display = 'none'; }, 4000);
     }
 
-    // Auth state check
     function updateAuthUI() {
       const token = localStorage.getItem('token');
       const container = document.getElementById('auth-nav-container');
       if (token) {
         container.innerHTML = `
           <div class="flex items-center gap-2">
-            <span class="text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">وارد شده</span>
-            <button type="button" onclick="logout()" class="text-xs text-slate-400 hover:text-rose-400 transition">خروج</button>
+            <span class="text-[11px] sm:text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">وارد شده</span>
+            <button type="button" onclick="logout()" class="text-[11px] sm:text-xs text-slate-400 hover:text-rose-400 transition">خروج</button>
           </div>
         `;
       } else {
         container.innerHTML = `
-          <button id="open-auth-btn" type="button" onclick="openAuthModal()" class="text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg transition font-medium">
+          <button id="open-auth-btn" type="button" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-2.5 sm:px-3.5 py-1.5 rounded-lg transition font-medium">
             ورود / ثبت‌نام
           </button>
         `;
@@ -293,7 +291,6 @@
       showToast('با موفقیت خارج شدید');
     }
 
-    // Modal Handlers
     function openAuthModal() {
       document.getElementById('auth-modal').style.display = 'flex';
     }
@@ -309,7 +306,6 @@
 
     let activePhone = "";
 
-    // Step 1: Send OTP
     async function sendOtp() {
       const phone = document.getElementById('phone-input').value.trim();
       if (!phone || phone.length < 10) {
@@ -341,7 +337,6 @@
       }
     }
 
-    // Step 2: Verify OTP
     async function verifyOtp() {
       const code = document.getElementById('otp-input').value.trim();
       if (!code) {
@@ -378,7 +373,6 @@
       }
     }
 
-    // Trigger Analyze
     function handleAnalyzeClick() {
       const problem = document.getElementById('problem-input').value.trim();
       if (!problem) {
@@ -407,7 +401,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `GAPGPTMASKTOKENlg9o37gcehX0X`
           },
           body: JSON.stringify({ problem_text: problemText })
         });
@@ -429,7 +423,6 @@
           throw new Error(typeof data.detail === 'string' ? data.detail : 'خطا در تحلیل مشکل');
         }
 
-        // Render response
         document.getElementById('res-explanation').innerText = data.explanation || 'توضیحی ثبت نشده است';
         document.getElementById('res-exercise').innerText = data.exercise || 'تمرینی ثبت نشده است';
         
@@ -456,7 +449,6 @@
       }
     }
 
-    // Init
     document.addEventListener('DOMContentLoaded', () => {
       updateAuthUI();
     });
