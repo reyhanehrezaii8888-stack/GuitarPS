@@ -1,336 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GuitarPS | دستیار همراه و رفع اشکال هوشمند گیتار</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Vazirmatn', sans-serif; }
-    /* انیمیشن برای ورود نرم منوی موبایل */
-    .mobile-menu-enter { transform: translateX(100%); transition: transform 0.3s ease-out; }
-    .mobile-menu-enter-active { transform: translateX(0); }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>GuitarPS | دستیار هوشمند نوازندگی گیتار</title>
+<meta name="description" content="مشکل نوازندگی‌ات را بنویس و در چند ثانیه تحلیل ریشه‌ای، تمرین اصلاحی و ابزار معتبر بگیر. سه تحلیل اول رایگان.">
+<link rel="canonical" href="https://guitarreyhane.ir/">
+<meta property="og:title" content="GuitarPS | دستیار هوشمند نوازندگی گیتار">
+<meta property="og:description" content="مشکل نوازندگی‌ات را بنویس و در چند ثانیه تحلیل ریشه‌ای، تمرین اصلاحی و ابزار معتبر بگیر. سه تحلیل اول رایگان.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/style.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+<body>
 
-  <!-- Header / Navbar -->
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      
-      <!-- Logo & Hamburger (Mobile) -->
-      <div class="flex items-center gap-3">
-        <!-- Hamburger Button (Mobile Only) -->
-        <button id="hamburger-btn" type="button" onclick="toggleMobileMenu(true)" class="md:hidden p-2 -mr-2 text-slate-300 hover:text-white" aria-label="Open Menu">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-        </button>
+<!-- ══════════ هدر مشترک ══════════ -->
+<header class="topbar">
+  <div class="wrap nav">
+    <a class="brand" href="index.html"><span class="brand-mark">&#9835;</span>GuitarPS</a>
+    <button class="menu" aria-label="منو" onclick="document.querySelector('.links').classList.toggle('open')">&#9776;</button>
+    <nav class="links">
+      <a href="index.html">خانه</a>
+      <a href="about.html">درباره ما</a>
+      <a href="pricing.html">تعرفه‌ها</a>
+      <a href="faq.html">سوالات متداول</a>
+      <a href="contact.html">تماس با ما</a>
+    </nav>
+    <div class="nav-actions"><button class="login" onclick="openAuth()">ورود / ثبت‌نام</button></div>
+  </div>
+</header>
 
-        <!-- Logo -->
-        <div class="flex items-center gap-2.5 cursor-pointer shrink-0" onclick="switchTab('home')">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-            <span class="text-lg sm:text-xl">🎸</span>
-          </div>
-          <div class="hidden xs:block">
-            <span class="text-base sm:text-lg font-black tracking-tight text-white block leading-none">GuitarPS</span>
-            <span class="text-[9px] text-indigo-400 font-medium">دستیار هوشمند گیتار</span>
-          </div>
-        </div>
+<!-- ══════════ نماد اعتماد (بالای main، طبق الزام اینماد) ══════════ -->
+<div class="wrap seal-row">
+  <a referrerpolicy="origin" target="_blank" href="https://trustseal.enamad.ir/?id=8670695&amp;Code=GAPGPTMASKTOKENorao10rtm0mX0X"><img referrerpolicy="origin" src="https://trustseal.enamad.ir/logo.aspx?id=8670695&amp;Code=GAPGPTMASKTOKENorao10rtm0mX1X" alt="نماد اعتماد الکترونیکی" style="cursor:pointer" code="GAPGPTMASKTOKENorao10rtm0mX2X"></a>
+</div>
+
+<main>
+
+<!-- ══════════ ۱) HERO ══════════ -->
+<section class="hero"><div class="wrap hero-grid"><div><span class="eyebrow"><i class="pulse"></i> مربی شخصی گیتار، همیشه در دسترس</span><h1>دستیار هوشمند رفع چالش‌های <span>نوازندگی گیتار</span></h1><p class="hero-copy">مشکل، درد دست یا گیر آکوردت رو بنویس؛ در ۳ ثانیه تحلیل عیب، تمرین اصلاحی اختصاصی و ابزار معتبر دریافت کن.</p><div class="free-badge"><b>۳ تحلیل کاملاً رایگان</b> بدون نیاز به پرداخت</div><div class="hero-ctas"><button class="primary" onclick="document.querySelector('#analysis').scrollIntoView({behavior:'smooth'})">تحلیل چالش من <span>←</span></button><a class="outline" href="#sample" style="text-decoration:none">دیدن نمونه خروجی</a></div><div class="micro">بدون پسورد · پاسخ اختصاصی · ساخته‌شده برای نوازنده‌ها</div></div><div class="preview"><div class="preview-head"><span class="preview-title">پیش‌نمایش تحلیل هوشمند</span><span class="live">● تحلیل زنده</span></div><div class="user-bubble">«وقتی آکورد F می‌گیرم سیم‌ها گز می‌زنن و بعد از چند دقیقه مچم درد می‌گیره...»</div><div class="out-list"><div class="out-item"><span class="num">۰۱</span><div><strong>ریشه‌یابی مشکل</strong><small>بررسی زاویه شست و فشار دست چپ</small></div></div><div class="out-item"><span class="num">۰۲</span><div><strong>تمرین اصلاحی شخصی</strong><small>روتین کوتاه برای باره‌گیری تمیز</small></div></div><div class="out-item"><span class="num">۰۳</span><div><strong>ابزار پیشنهادی</strong><small>مترونوم و تمرین قابل‌پیگیری</small></div></div></div><div class="float-note">✓ برنامه تمرینی آماده شد</div></div></div></section>
+
+<!-- ══════════ ۲) PAIN ══════════ -->
+<section class="pain" id="features"><div class="wrap"><div class="section-head"><span class="kicker">آشناست؟</span><h2>۳ چالش همیشگی هر نوازنده گیتار</h2><p>به‌جای ساعت‌ها جست‌وجو، دقیقاً همان چیزی را پیدا کن که برای مشکل تو جواب می‌دهد.</p></div><div class="cards"><article class="pain-card"><div class="iconbox">〰</div><h3>صدای گز و خفگی سیم‌ها در باره و آکوردها</h3><p>فشار زیاد و زاویه نامناسب، هم صدای تمیز را می‌گیرد هم دست را خسته می‌کند.</p><div class="solution">راه‌حل: تصحیح بیومکانیک زاویه شست و ثقل مچ</div></article><article class="pain-card"><div class="iconbox">♬</div><h3>کندی و جا ماندن انگشت‌ها در جابجایی ریتم</h3><p>وقتی انگشت‌ها مستقل عمل نکنند، تغییر آکورد وسط ریتم سخت می‌شود.</p><div class="solution">راه‌حل: روتین استقلال انگشتان (Finger Independence)</div></article><article class="pain-card"><div class="iconbox">⌕</div><h3>سردرگمی بین صدها ویدیوی آموزشی پراکنده</h3><p>هر آموزش یک مسیر می‌گوید؛ تشخیص قدم بعدی دشوار می‌شود.</p><div class="solution">راه‌حل: نسخه تمرینی مستقیم برای مشکل اختصاصی همین لحظه</div></article></div></div></section>
+
+<!-- ══════════ ۳) SAMPLE ══════════ -->
+<section id="sample"><div class="wrap showcase"><div class="showcase-copy"><span class="kicker">یک پاسخ کاربردی، نه یک جواب کلی</span><h2>خروجی واقعی GuitarPS چه شکلی است؟</h2><p>هر تحلیل، چالش تو را به یک برنامه عملی تبدیل می‌کند؛ از علت تا تمرین و ابزار لازم.</p><div class="check"><i>✓</i> تحلیل ریشه‌ای بر پایه آناتومی و تکنیک</div><div class="check"><i>✓</i> تمرین کوتاه و مرحله‌بندی‌شده</div><div class="check"><i>✓</i> ابزار معتبر برای تمرین دقیق‌تر</div></div><div class="report"><div class="report-top"><b>تحلیل چالش: گز زدن آکورد F</b><span>✓ تکمیل‌شده</span></div><div class="report-body"><div class="report-part"><span class="num">۱</span><div><b>تحلیل ریشه‌ای مشکل</b><p>تماس ناکافی کناره انگشت اشاره با سیم‌ها و فشار بیش‌ازحد شست می‌تواند صدای گز ایجاد کند. مچ را کمی جلو بیاور و شست را پشت دسته نگه دار.</p></div></div><div class="report-part"><span class="num">۲</span><div><b>روتین تمرین گام‌به‌گام · روزی ۵ دقیقه</b><p>۱ دقیقه چیدمان آرام انگشت اشاره · ۲ دقیقه فشار و رهاسازی · ۲ دقیقه نواختن تک‌تک سیم‌ها و اصلاح تماس.</p></div></div><div class="report-part"><span class="num">۳</span><div><b>جعبه‌ابزار استاندارد</b><p>با سرعت پایین شروع کن و کیفیت صدای هر سیم را جداگانه بررسی کن.</p><a class="tool-link" href="https://www.metronomeonline.com/" target="_blank" rel="noreferrer">↗ مترونوم آنلاین · ابزار تمرین</a></div></div></div></div></div></section>
+
+<!-- ══════════ ۴) JOURNEY ══════════ -->
+<section class="journey"><div class="wrap"><div class="section-head"><span class="kicker">ساده و سریع</span><h2>شروع رفع اشکال در ۳ گام ساده</h2></div><div class="steps"><div class="step"><span class="stepno">۱</span><div><b>چالش نوازندگی‌ات را بنویس</b><small>با جزئیاتی که یادت می‌آید</small></div></div><div class="step"><span class="stepno">۲</span><div><b>با پیامک تایید شو</b><small>بدون نیاز به پسورد</small></div></div><div class="step"><span class="stepno">۳</span><div><b>برنامه تمرینی اصلاحی‌ات را دریافت کن</b><small>مختص چالش تو</small></div></div></div></div></section>
+
+<!-- ══════════ ۵) ANALYSIS FORM ══════════ -->
+<section class="form-section" id="analysis"><div class="wrap"><div class="section-head"><span class="kicker">سه تحلیل اول رایگان</span><h2>همین حالا چالش نوازندگی‌ات را تحلیل کن</h2><p>هرچه دقیق‌تر بنویسی، پاسخ کاربردی‌تری می‌گیری.</p></div><div class="analysis-box"><label for="challenge">چالش یا سوالت درباره نوازندگی</label><textarea id="challenge" placeholder="مثلاً: وقتی آکورد F می‌گیرم، سیم اول صدای گز می‌دهد و مچ دستم بعد از چند دقیقه درد می‌گیرد..."></textarea><div class="chips"><button class="chip" type="button">گز زدن آکورد F</button><button class="chip" type="button">درد مچ در باره گرفتن</button><button class="chip" type="button">نامیزان بودن ریتم ۶/۸</button><button class="chip" type="button">کندی تعویض C به G</button></div><div class="fields"><div><label for="level">سطح نوازندگی</label><select class="field" id="level"><option>مبتدی</option><option>متوسط</option><option>پیشرفته</option></select></div><div><label for="guitar">نوع گیتار</label><select class="field" id="guitar"><option>کلاسیک</option><option>پاپ</option><option>آکوستیک</option><option>الکتریک</option></select></div></div><div class="submit-row"><button class="primary" id="analyze">تحلیل رایگان چالش <span>←</span></button><span class="quota">سهمیه باقی‌مانده: <b>۳ تحلیل رایگان</b></span></div><div class="form-result" id="form-result"></div></div></div></section>
+
+<!-- ══════════ ۶) PRICING ══════════ -->
+<section id="pricing"><div class="wrap"><div class="section-head"><span class="kicker">انتخاب پلن - شفاف و منصفانه</span><h2>یک قدم نزدیک‌تر به نوازندگی بهتر</h2><p>از سه تحلیل رایگان شروع کن و هر زمان خواستی ادامه بده.</p></div><div class="pricing"><article class="plan"><h3>GeneralPS</h3><div class="price">رایگان</div><ul><li>۳ تحلیل عمیق هوش مصنوعی</li><li>تمرینات اصلاحی گام‌به‌گام</li><li>لینک به ابزارهای استاندارد</li><li>بدون تاریخ انقضا</li></ul><button class="outline" onclick="document.querySelector('#analysis').scrollIntoView({behavior:'smooth'})">شروع رایگان</button></article><article class="plan featured"><span class="plan-tag">برای تمرین پیوسته</span><h3>ViPS</h3><div class="price">۳۹۹٬۰۰۰ <small>تومان / ماهانه</small></div><ul><li>تحلیل نامحدود ماهانه چالش‌ها</li><li>دسترسی به متدهای ویژه اصلاح تکنیک</li><li>اولویت پردازش</li><li>کمتر از هزینه نصف یک جلسه کلاس خصوصی!</li></ul><button class="primary" onclick="openAuth()">انتخاب پلن ViPS</button></article></div></div></section>
+
+<!-- ══════════ ۷) FAQ ══════════ -->
+<section class="faq" id="faq"><div class="wrap"><div class="section-head"><span class="kicker">پاسخ پرسش‌های پرتکرار</span><h2>سوالات متداول</h2></div><div class="faq-list"><div class="faq-item"><button class="faq-q"><span>GuitarPS برای چه سطحی از نوازندگی مناسب است؟</span><span>＋</span></button><div class="faq-a">برای نوازنده‌های مبتدی تا پیشرفته طراحی شده. سطح و نوع گیتار را در فرم مشخص کن تا راهنمایی متناسب‌تری بگیری.</div></div><div class="faq-item"><button class="faq-q"><span>سه تحلیل رایگان چه محدودیتی دارند؟</span><span>＋</span></button><div class="faq-a">سه تحلیل عمیق رایگان در اختیارت است و این سهمیه تاریخ انقضا ندارد. برای تحلیل‌های بیشتر می‌توانی پلن ViPS را انتخاب کنی.</div></div><div class="faq-item"><button class="faq-q"><span>برای ثبت‌نام باید رمز عبور بسازم؟</span><span>＋</span></button><div class="faq-a">خیر. ورود و تایید حساب با کد یک‌بارمصرف پیامکی انجام می‌شود.</div></div><div class="faq-item"><button class="faq-q"><span>پاسخ‌ها جایگزین کلاس یا بررسی پزشک هستند؟</span><span>＋</span></button><div class="faq-a">پیشنهادها برای تمرین آموزشی‌اند و جایگزین کلاس حضوری یا تشخیص تخصصی پزشکی نیستند. در صورت درد مداوم، تمرین را متوقف و با متخصص مشورت کن.</div></div><div class="faq-item"><button class="faq-q"><span>چطور پاسخ اختصاصی چالشم را دریافت کنم؟</span><span>＋</span></button><div class="faq-a">چالش را در فرم بنویس، با کد پیامکی تایید شو و تحلیل و برنامه تمرینی را در حساب خود دریافت کن.</div></div></div></div></section>
+
+</main>
+
+<!-- ══════════ فوتر مشترک ══════════ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="index.html"><span class="brand-mark">&#9835;</span>GuitarPS</a>
+        <p>دستیار هوشمند نوازندگی؛ برای تمرین هدفمند، رفع چالش و لذت بیشتر از گیتار.</p>
+        <div class="trust">&#9813; پرداخت و ورود امن</div>
       </div>
-
-      <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-1">
-        <button onclick="switchTab('home')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-indigo-400 bg-slate-800" id="nav-home">خانه</button>
-        <button onclick="switchTab('solve')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-solve">رفع اشکال</button>
-        <button onclick="switchTab('about')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-about">درباره ما</button>
-        <button onclick="switchTab('plans')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-plans">پلن‌ها</button>
-        <button onclick="switchTab('contact')" class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800/60" id="nav-contact">تماس با ما</button>
-      </nav>
-
-      <!-- Auth Button -->
-      <div id="auth-nav-container">
-        <button onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg transition font-medium">ورود / ثبت‌نام</button>
+      <div>
+        <h4>دسترسی سریع</h4>
+        <a href="index.html#features">امکانات</a>
+        <a href="index.html#sample">نمونه خروجی</a>
+        <a href="pricing.html">تعرفه‌ها</a>
+        <a href="faq.html">سوالات متداول</a>
+      </div>
+      <div>
+        <h4>حساب کاربری</h4>
+        <a href="index.html#analysis">تحلیل چالش</a>
+        <a href="pricing.html">پلن‌ها</a>
+        <a href="about.html">درباره ما</a>
+        <a href="contact.html">تماس با ما</a>
+      </div>
+      <div>
+        <h4>قوانین و تماس</h4>
+        <a href="terms.html">قوانین و شرایط</a>
+        <a href="privacy.html">حریم خصوصی</a>
+        <a href="mailto:hello@guitarreyhane.ir">hello@guitarreyhane.ir</a>
+        <a href="https://instagram.com/" target="_blank" rel="noreferrer">اینستاگرام GuitarPS</a>
       </div>
     </div>
-  </header>
+    <div class="copyright">&#169; تمامی حقوق برای GuitarPS محفوظ است.</div>
+  </div>
+</footer>
 
-  <!-- Mobile Drawer Menu (Sidebar) -->
-  <div id="mobile-menu-overlay" onclick="toggleMobileMenu(false)" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
-  <aside id="mobile-menu" class="fixed top-0 right-0 bottom-0 z-50 w-72 bg-slate-900 border-l border-slate-800 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
-    <div class="p-6 space-y-6">
-      <div class="flex items-center justify-between">
-        <span class="text-xl font-black text-white">GuitarPS</span>
-        <button onclick="toggleMobileMenu(false)" class="text-slate-400">✕</button>
-      </div>
-      <nav class="flex flex-col gap-2">
-        <button onclick="switchTab('home'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-indigo-400 bg-slate-800/50 font-bold">خانه</button>
-        <button onclick="switchTab('solve'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">رفع اشکال</button>
-        <button onclick="switchTab('about'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">درباره ما</button>
-        <button onclick="switchTab('plans'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">پلن‌ها</button>
-        <button onclick="switchTab('contact'); toggleMobileMenu(false)" class="text-right px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 transition">تماس با ما</button>
-      </nav>
+<!-- ══════════ مودال OTP ══════════ -->
+<div class="modal-back" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+  <div class="modal">
+    <button class="close" aria-label="بستن" onclick="closeAuth()">&#215;</button>
+    <h3 id="auth-title">ورود به GuitarPS</h3>
+    <p id="auth-desc">شماره موبایلت را وارد کن تا کد تایید برایت پیامک شود.</p>
+    <div class="auth-step active" id="step-phone">
+      <label for="phone">شماره موبایل</label>
+      <input id="phone" type="tel" inputmode="tel" placeholder="09xxxxxxxxx">
+      <div class="auth-msg" id="phone-msg"></div>
+      <button class="primary" id="request-otp">دریافت کد تایید</button>
     </div>
-  </aside>
-
-  <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
-    
-    <!-- TABS -->
-    <!-- HOME -->
-    <section id="tab-home" class="space-y-12 block">
-        <div class="text-center space-y-5 max-w-2xl mx-auto pt-6">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">✨ اولین پلتفرم هوشمند رفع چالش‌های نوازندگی</div>
-            <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight">صدای شفاف، تکنیک درست؛ <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-sky-300">با دستیار هوشمند GuitarPS</span></h1>
-            <p class="text-slate-400 text-sm sm:text-base leading-relaxed">مشکلت را بنویس تا یک تمرین کاربردی و ابزار مناسب دریافت کنی.</p>
-            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button onclick="switchTab('solve')" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition">شروع رفع اشکال</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- SOLVE -->
-    <section id="tab-solve" class="hidden space-y-8">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
-            <h2 class="text-xl font-bold mb-4"> رفع اشکال هوشمند</h2>
-            <textarea id="problem-input" rows="4" placeholder="مثلاً: سیم ۴ موقع باره گرفتن گز می‌دهد..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-white focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
-            <button onclick="handleAnalyzeClick()" id="analyze-btn" class="mt-4 w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
-                تحلیل و دریافت تمرین
-                <svg id="btn-spinner" class="hidden animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-            </button>
-        </div>
-        <div id="result-area" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <span class="text-xs font-bold text-indigo-400 mb-2 block">۱. ریشه مشکل</span>
-                <p id="res-explanation" class="text-slate-300 text-sm leading-relaxed"></p>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-                <span class="text-xs font-bold text-emerald-400 mb-2 block">۲. تمرین تجویزی</span>
-                <p id="res-exercise" class="text-slate-300 text-sm leading-relaxed"></p>
-            </div>
-            <div id="res-tool-part" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <span class="text-xs font-bold text-sky-400 mb-2 block">۳. ابزار کمکی</span>
-                    <h4 id="res-tool-name" class="font-bold text-white mb-2"></h4>
-                    <p id="res-tool-desc" class="text-slate-300 text-sm leading-relaxed mb-4"></p>
-                </div>
-                <a id="res-tool-link" href="#" target="_blank" class="block text-center py-2 bg-slate-800 text-indigo-300 rounded-lg text-xs font-bold transition hover:bg-slate-700">دانلود ابزار</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="tab-about" class="hidden max-w-3xl mx-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6">
-            <h2 class="text-2xl font-black">درباره GuitarPS</h2>
-            <p class="text-slate-300 leading-relaxed">اگه تو هم وقتی یه تکنیک جدید یاد گرفتی و میخوای تمرینش کنی ، نمیتونی خوب اجراش کنی و نیاز به نفر داری که بهت بگه چطور تمرینش کنی تا در کمترین زمان بهترین بازدهی رو بگیری،این اپ برای خودته.
-            من ریحانه ام و این یکی از مشکلاتی بود که خودم هم داشتم.وقتی یه مشکل داشتم، کسی نبود که بهم بگه چطور باید حلش کنم ، اگر هم میخواستم از استادم بپرسم، باید یک هفته تا جلسه بعد صبر میکردم. به این صورت، این به ذهنم اومد که به نوازنده ها کمک کنم اگه مشکلی دارن، خیلی راحت توضیحش بدن و برای تمرین مناسب رو ببینن.
-            برای شروع، روی دکمه زیر کلیک کن!</p>
-        </div>
-                      <button onclick="switchTab('solve')" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition">شروع رفع اشکال</button>
-    </section>
-
-    <!-- PLANS (New Section) -->
-    <section id="tab-plans" class="hidden space-y-8">
-        <h2 class="text-3xl font-black text-center">انتخاب پلن اشتراک</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-center">
-                <h3 class="text-xl font-bold">پلن رایگان</h3>
-                <p class="text-3xl font-black my-4">0 <span class="text-sm font-normal">تومان</span></p>
-                <ul class="text-slate-400 text-sm space-y-2 mb-6"><li>۳ تحلیل هوشمند</li><li>دسترسی به تمرینات پایه</li></ul>
-                <button disabled class="w-full py-3 bg-slate-800 text-slate-500 rounded-xl font-bold">فعال شده</button>
-            </div>
-            <div class="bg-slate-900 border-2 border-indigo-500 p-8 rounded-3xl text-center relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[10px] px-3 py-1 font-bold">ویژه</div>
-                <h3 class="text-xl font-bold text-indigo-400">پلن نامحدود (ماهانه)</h3>
-                <p class="text-3xl font-black my-4 text-white">399,000 <span class="text-sm font-normal">تومان</span></p>
-                <ul class="text-slate-300 text-sm space-y-2 mb-6"><li>تحلیل نامحدود</li><li>دسترسی به تمام ابزارها</li><li>پشتیبانی اولویت‌دار</li></ul>
-                <button class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition">خرید اشتراک</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- CONTACT (New Section) -->
-    <section id="tab-contact" class="hidden max-w-2xl mx-auto text-center space-y-6">
-        <h2 class="text-3xl font-black">تماس با ما</h2>
-        <p class="text-slate-400">برای پشتیبانی یا سوالات در مورد دوره‌ها، از طریق راه‌های زیر با ما در ارتباط باشید.</p>
-        <div class="flex flex-col gap-4">
-            <a href="#" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-indigo-500 transition">
-                <span class="block text-indigo-400 font-bold mb-1">اینستاگرام</span>
-                <span class="text-sm">پیج آموزش گیتار ریحانه</span>
-            </a>
-            <a href="mailto:info@guitarps.ir" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-indigo-500 transition">
-                <span class="block text-indigo-400 font-bold mb-1">ایمیل</span>
-                <span class="text-sm">info@guitarps.ir</span>
-            </a>
-        </div>
-    </section>
-
-  </main>
-
-  <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-xs text-slate-600">
-    پلتفرم GuitarPS © ۱۴۰۵ - دستیار هوشمند و رفع اشکال گیتار
-  
-  <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=8670695&Code=s72Dmfl5utKnGgtUlbWOCucoF8n4GE3P'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=8670695&Code=s72Dmfl5utKnGgtUlbWOCucoF8n4GE3P' alt='' style='cursor:pointer' code='s72Dmfl5utKnGgtUlbWOCucoF8n4GE3P'></a>
-  </footer>
-
-  <!-- AUTH MODAL -->
-  <div id="auth-modal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-slate-400">✕</button>
-      <div class="text-center space-y-4">
-        <div class="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-xl">📱</div>
-        <h3 class="text-lg font-bold">ورود با شماره موبایل</h3>
-      </div>
-      <!-- Step 1 -->
-      <div id="auth-step-phone" class="mt-6 space-y-4">
-        <input id="phone-input" type="tel" dir="ltr" placeholder="09123456789" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-white focus:outline-none focus:border-indigo-500 tracking-wider" />
-        <button id="send-otp-btn" onclick="sendOtp()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg">دریافت کد تایید</button>
-      </div>
-      <!-- Step 2 -->
-      <div id="auth-step-otp" style="display: none;" class="mt-6 space-y-4">
-        <input id="otp-input" type="text" dir="ltr" placeholder="1234" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-white text-xl tracking-[0.5em] font-mono" />
-        <button id="verify-otp-btn" onclick="verifyOtp()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl">تایید نهایی</button>
-      </div>
+    <div class="auth-step" id="step-otp">
+      <label for="otp">کد پیامک‌شده</label>
+      <input id="otp" type="text" inputmode="numeric" maxlength="5" placeholder="-----">
+      <div class="auth-msg" id="otp-msg"></div>
+      <button class="primary" id="verify-otp">تایید و ادامه</button>
+      <button class="back-link" id="back-phone">&#8592; تغییر شماره موبایل</button>
     </div>
   </div>
-
-  <div id="toast" style="display: none;" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl text-sm font-bold shadow-2xl"></div>
-
-  <!-- LOGIC -->
-  <script>
-    const API_BASE = "https://app.guitarreyhane.ir";
-
-    function toggleMobileMenu(open) {
-      const menu = document.getElementById('mobile-menu');
-      const overlay = document.getElementById('mobile-menu-overlay');
-      if (open) {
-        menu.classList.remove('translate-x-full');
-        overlay.classList.remove('hidden');
-        setTimeout(() => overlay.classList.add('opacity-100'), 10);
-      } else {
-        menu.classList.add('translate-x-full');
-        overlay.classList.remove('opacity-100');
-        setTimeout(() => overlay.classList.add('hidden'), 300);
-      }
-    }
-
-    function switchTab(tabId) {
-      const sections = ['home', 'solve', 'about', 'plans', 'contact'];
-      sections.forEach(s => {
-        document.getElementById('tab-' + s).classList.add('hidden');
-        document.getElementById('tab-' + s).classList.remove('block');
-        
-        // Update Navbar Desktop UI
-        const btn = document.getElementById('nav-' + s);
-        if(btn) {
-          btn.classList.remove('text-indigo-400', 'bg-slate-800');
-          btn.classList.add('text-slate-300');
-        }
-      });
-      
-      const target = document.getElementById('tab-' + tabId);
-      target.classList.remove('hidden');
-      target.classList.add('block');
-      
-      const activeBtn = document.getElementById('nav-' + tabId);
-      if(activeBtn) {
-        activeBtn.classList.add('text-indigo-400', 'bg-slate-800');
-        activeBtn.classList.remove('text-slate-300');
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function showToast(msg, isError = false) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl text-sm font-bold shadow-2xl ${isError ? 'bg-rose-500 text-white' : 'bg-emerald-600 text-white'}`;
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 3000);
-    }
-
-    function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
-    function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
-
-    let activePhone = "";
-    async function sendOtp() {
-      const phone = document.getElementById('phone-input').value.trim();
-      if (!phone || phone.length < 10) return showToast('شماره نامعتبر است', true);
-      activePhone = phone;
-      try {
-        const res = await fetch(`${API_BASE}/api/auth/otp/request`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone_number: phone })
-        });
-        if (!res.ok) throw new Error('خطا در ارسال کد');
-        showToast('کد تایید ارسال شد');
-        document.getElementById('auth-step-phone').style.display = 'none';
-        document.getElementById('auth-step-otp').style.display = 'block';
-      } catch (err) { showToast(err.message, true); }
-    }
-
-    async function verifyOtp() {
-      const code = document.getElementById('otp-input').value.trim();
-      try {
-        const res = await fetch(`${API_BASE}/api/auth/otp/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone_number: activePhone, code: code })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error('کد نامعتبر است');
-        localStorage.setItem('token', data.access_token);
-        location.reload();
-      } catch (err) { showToast(err.message, true); }
-    }
-
-    async function handleAnalyzeClick() {
-      const problem = document.getElementById('problem-input').value.trim();
-      if (!problem) return showToast('ابتدا مشکل را بنویسید', true);
-      const token = localStorage.getItem('token');
-      if (!token) return openAuthModal();
-
-      const btn = document.getElementById('analyze-btn');
-      const spinner = document.getElementById('btn-spinner');
-      btn.disabled = true; spinner.classList.remove('hidden');
-
-      try {
-        const res = await fetch(`${API_BASE}/api/analyze`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-          },
-          body: JSON.stringify({ problem_text: problem })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || 'خطا در تحلیل');
-
-        document.getElementById('res-explanation').innerText = data.explanation;
-        document.getElementById('res-exercise').innerText = data.exercise;
-        if (data.tool) {
-            document.getElementById('res-tool-name').innerText = data.tool.name;
-            document.getElementById('res-tool-desc').innerText = data.tool.description;
-            document.getElementById('res-tool-link').href = data.tool.link;
-        }
-        document.getElementById('result-area').classList.remove('hidden');
-        document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
-      } catch (err) { showToast(err.message, true); }
-      finally { btn.disabled = false; spinner.classList.add('hidden'); }
-    }
-
-    // بستن منو با Escape
-    document.addEventListener('keydown', (e) => { if (e.key === "Escape") toggleMobileMenu(false); });
-    
-    // نمایش وضعیت دکمه ورود
-    window.onload = () => {
-        if (localStorage.getItem('token')) {
-            document.getElementById('auth-nav-container').innerHTML = `<button onclick="localStorage.removeItem('token'); location.reload();" class="text-xs text-rose-400 font-bold">خروج</button>`;
-        }
-    };
-  </script>
+</div>
+<div class="toast" id="toast"></div>
+<script src="assets/app.js"></script>
 </body>
 </html>
